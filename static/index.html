@@ -1,0 +1,3493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="author" content="BeastOfSyn">
+<meta name="description" content="Configuration Comparison Tool v12.3 by BeastOfSyn">
+<title>Configuration Comparison Tool</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS & SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --navy:       #0d1b2e;
+  --navy-light: #132340;
+  --blue:       #1d68a4;
+  --blue-hover: #165384;
+  --blue-lt:    #eaf2f8;
+  --blue-md:    #cde0ee;
+
+  /* Brand Fuchsia System */
+  --fuchsia:        #e8006a;
+  --fuchsia-hover:  #cc005d;
+  --fuchsia-dark:   #a8004e;
+  --fuchsia-deep:   #7a0039;
+  --fuchsia-lt:     #fce7f3;
+  --fuchsia-md:     #f48fb1;
+  --fuchsia-glow:   rgba(232,0,106,0.30);
+  
+  /* Strong readable text — not muted */
+  --ink:        #111827;
+  --muted:      #1f2937;
+  --light:      #4b5563;
+  --subtle:     #6b7280;
+
+  --bg:         #f3f4f6;
+  --surface:    #ffffff;
+  --soft:       #f9fafb;
+  --line:       #d1d5db;
+  --line-lt:    #e5e7eb;
+
+  /* Semantic - Relative to PROD */
+  --green:      #15803d;
+  --green-bg:   #ecfdf5;
+  --green-line: #a7f3d0;
+  --green-dot:  #22c55e;
+
+  --red:        #b91c1c;
+  --red-bg:     #fef2f2;
+  --red-line:   #fecaca;
+  --red-dot:    #ef4444;
+
+  --amber:      #92400e;
+  --amber-bg:   #fffbeb;
+  --amber-line: #fde68a;
+  --amber-dot:  #f59e0b;
+
+  --info:       #1d4ed8;
+  --info-bg:    #eff6ff;
+  --info-line:  #bfdbfe;
+  --info-dot:   #3b82f6;
+
+  --purple:     #6d28d9;
+  --purple-bg:  #f5f3ff;
+  --purple-line:#ddd6fe;
+  --purple-dot: #8b5cf6;
+
+  --slate-dot:  #6b7280;
+
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r:    8px;
+  --r-lg: 12px;
+
+  --sh-xs: 0 1px 2px rgba(15,23,42,0.07);
+  --sh-sm: 0 1px 3px rgba(15,23,42,0.10), 0 1px 2px rgba(15,23,42,0.06);
+  --sh:    0 4px 6px -1px rgba(15,23,42,0.10), 0 2px 4px -2px rgba(15,23,42,0.06);
+  --sh-lg: 0 10px 15px -3px rgba(15,23,42,0.10), 0 4px 6px -4px rgba(15,23,42,0.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; border: none; background: none; }
+.hidden { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════
+   APP STRUCTURE
+   ═══════════════════════════════════════════════════════════ */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Top Header (Fuchsia Upper Panel) ───────────────────── */
+.topbar {
+  flex-shrink: 0;
+  height: 56px;
+  background: linear-gradient(135deg, #e8006a 0%, #d4005f 40%, #b20052 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 30;
+  box-shadow: 0 3px 14px rgba(232,0,106,0.35), 0 1px 3px rgba(0,0,0,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.logo-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Brand Symbol & Logo Container */
+.bn-brand-group {
+  display: flex;
+  align-items: center;
+  cursor: default;
+  user-select: none;
+}
+.bn-logo-container {
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+.bn-symbol-svg {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.topbar-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255,255,255,0.25);
+  margin: 0 2px;
+}
+
+.logo-text {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  color: #ffffff;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.logo-text .sub-txt {
+  color: #ffffff;
+  font-weight: 800;
+}
+.topbar-right-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-author-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: default;
+  white-space: nowrap;
+}
+.topbar-author-label {
+  opacity: 0.85;
+  font-weight: 500;
+}
+.topbar-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.45);
+  backdrop-filter: blur(6px);
+  cursor: default;
+  text-transform: uppercase;
+}
+.app-trademark-watermark {
+  position: fixed;
+  bottom: 8px;
+  right: 14px;
+  z-index: 999999;
+  font-size: 11.5px;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 0.75);
+  background: rgba(255, 255, 255, 0.90);
+  border: 1px solid rgba(209, 213, 219, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 3px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  user-select: none;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.app-trademark-watermark .tm-symbol {
+  color: var(--fuchsia);
+  font-weight: 800;
+}
+
+/* ── Upload Screen ──────────────────────────────────────── */
+.upload-screen {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 24px 60px;
+  background: radial-gradient(ellipse at 50% -10%, rgba(232,0,106,0.12) 0%, rgba(232,0,106,0.04) 40%, #f3f4f6 70%);
+}
+.upload-inner { width: 100%; max-width: 820px; }
+
+.upload-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fuchsia);
+  margin-bottom: 4px;
+}
+.hero h1 {
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  line-height: 1.22;
+  color: #111827;
+  margin-bottom: 8px;
+}
+.hero p {
+  font-size: 13.5px;
+  color: #374151;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.upload-card {
+  background: var(--surface);
+  border: 1px solid var(--line-lt);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.06);
+  transition: box-shadow .2s, transform .2s;
+}
+.upload-card:hover {
+  box-shadow: 0 8px 20px rgba(229,0,107,0.08);
+}
+.env-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.env-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.env-pill {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--fuchsia-lt);
+  color: var(--fuchsia);
+  border: 1px solid var(--fuchsia-md);
+}
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: var(--r);
+  padding: 20px 14px;
+  text-align: center;
+  background: var(--soft);
+  transition: border-color .15s, background .15s, transform .15s;
+  cursor: pointer;
+}
+.drop:hover, .drop.drag {
+  border-color: var(--fuchsia);
+  background: var(--fuchsia-lt);
+  transform: translateY(-1px);
+}
+.drop input { display: none !important; }
+.upload-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r);
+  background: var(--fuchsia-lt);
+  color: var(--fuchsia);
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+  border: 1px solid var(--fuchsia-md);
+  font-size: 18px;
+}
+.drop-title { font-weight: 700; color: var(--navy); font-size: 13px; margin-bottom: 2px; }
+.drop-sub { font-size: 11px; color: var(--light); }
+
+.file-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  border: 1px solid var(--green-line);
+  border-radius: var(--r);
+  padding: 16px;
+  background: var(--green-bg);
+  text-align: center;
+}
+.selected-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r);
+  background: rgba(22,163,74,0.15);
+  color: var(--green);
+  display: grid;
+  place-items: center;
+  margin-bottom: 6px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.selected-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--navy);
+  max-width: 90%;
+  word-break: break-word;
+  margin-bottom: 4px;
+}
+.selected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  background: rgba(22,163,74,0.12);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.file-actions { display: flex; gap: 8px; }
+.btn-change {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  transition: .15s;
+}
+.btn-change:hover { background: var(--bg); border-color: var(--subtle); }
+.btn-remove {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--red-line);
+  background: var(--surface);
+  color: var(--red);
+  transition: .15s;
+}
+.btn-remove:hover { background: var(--red-bg); }
+
+.compare-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.compare-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn-primary {
+  padding: 12px 36px;
+  border-radius: var(--r);
+  background: var(--fuchsia);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: .02em;
+  box-shadow: 0 4px 14px var(--fuchsia-glow);
+  transition: background .15s, transform .14s, box-shadow .15s, opacity .15s;
+  cursor: pointer;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--fuchsia-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(229,0,107,0.38);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  padding: 12px 24px;
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--navy);
+  border: 1.5px solid var(--line);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: .01em;
+  box-shadow: var(--sh-xs);
+  transition: background .15s, border-color .15s, transform .14s, box-shadow .15s;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-secondary:hover {
+  background: var(--fuchsia-lt);
+  border-color: var(--fuchsia-md);
+  color: var(--fuchsia);
+  transform: translateY(-1px);
+  box-shadow: var(--sh-sm);
+}
+.helper-txt { font-size: 11.5px; color: var(--light); }
+.error-banner {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: var(--r);
+  background: var(--red-bg);
+  border: 1px solid var(--red-line);
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── Module Selector Dropdown ─────────────────────────────── */
+.module-switch-wrapper { position: relative; display: inline-block; }
+.module-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.32);
+  border-radius: var(--r-sm);
+  background: rgba(255,255,255,0.18);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  backdrop-filter: blur(4px);
+  transition: all .14s;
+}
+.module-select-btn:hover, .module-select-btn[aria-expanded="true"] {
+  background: rgba(255,255,255,0.28);
+  border-color: rgba(255,255,255,0.55);
+}
+.module-select-btn .caret { font-size: 10px; color: rgba(255,255,255,0.9); }
+
+/* Results toolbar & upload variant of module select */
+.tb-module-btn {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--navy);
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+  box-shadow: var(--sh-xs);
+}
+.tb-module-btn:hover, .tb-module-btn[aria-expanded="true"] {
+  background: var(--fuchsia-lt);
+  border-color: var(--fuchsia-md);
+  color: var(--fuchsia);
+}
+.tb-module-btn .caret { color: var(--light); }
+
+.module-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 170px;
+  padding: 5px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--sh-lg);
+  z-index: 100;
+}
+.module-dropdown-menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: var(--r-xs);
+  color: var(--navy);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  transition: background .12s, color .12s;
+}
+.module-dropdown-menu button:hover {
+  background: var(--fuchsia-lt);
+  color: var(--fuchsia);
+}
+.module-dropdown-menu button.active {
+  background: var(--fuchsia-lt);
+  color: var(--fuchsia);
+  font-weight: 800;
+}
+.module-dropdown-menu .menu-check {
+  font-size: 12px;
+  color: var(--fuchsia);
+  font-weight: 800;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESULTS SCREEN (TOOLBAR + 29/71 SPLIT WORKSPACE)
+   ═══════════════════════════════════════════════════════════ */
+.results-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Results Toolbar ────────────────────────────────────── */
+.results-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 18px;
+  min-height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--sh-xs);
+  gap: 12px;
+  z-index: 20;
+}
+.toolbar-left-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1;
+}
+.direction-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1f2937;
+  background: var(--soft);
+  padding: 5px 9px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+.direction-pill .arr { color: var(--fuchsia); font-weight: 900; }
+
+/* KPI Chips */
+.kpi-chips-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: all .13s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+.kpi-chip:hover {
+  border-color: var(--fuchsia-md);
+  background: var(--fuchsia-lt);
+  color: var(--fuchsia);
+}
+.kpi-chip.active {
+  background: var(--fuchsia);
+  border-color: var(--fuchsia);
+  color: #ffffff;
+  box-shadow: 0 2px 6px var(--fuchsia-glow);
+}
+.kpi-chip.active .chip-count {
+  color: #ffffff;
+}
+.kpi-chip .chip-count {
+  font-weight: 800;
+  color: var(--navy);
+}
+.kpi-chip.active-modified.active { background: var(--amber); border-color: var(--amber); color: #fff; }
+.kpi-chip.active-added.active    { background: var(--green); border-color: var(--green); color: #fff; }
+.kpi-chip.active-removed.active  { background: var(--red);   border-color: var(--red);   color: #fff; }
+.kpi-chip.active-audit.active    { background: var(--blue);  border-color: var(--blue);  color: #fff; }
+.kpi-chip.active-dq.active       { background: var(--purple);border-color: var(--purple);color: #fff; }
+
+.skipped-info-pill {
+  font-size: 10.5px;
+  color: var(--light);
+  font-weight: 600;
+  background: var(--soft);
+  padding: 3px 8px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line-lt);
+  white-space: nowrap;
+}
+.skipped-info-pill.pill-warn {
+  color: #92400e;
+  background: #fef3c7;
+  border-color: #fde68a;
+  font-weight: 800;
+}
+.skipped-info-pill { cursor: pointer; }
+.skipped-info-detail {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: var(--r-xs);
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  font-size: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.skip-verdict { margin-bottom: 8px; line-height: 1.5; color: #78350f; }
+.skip-reason-list { border-top: 1px solid #fde68a; padding-top: 8px; }
+.skip-reason-row { padding: 2px 0; color: #92400e; }
+.recovered-info-pill {
+  font-size: 10.5px;
+  color: #166534;
+  font-weight: 700;
+  background: #f0fdf4;
+  padding: 3px 8px;
+  border-radius: var(--r-xs);
+  border: 1px solid #bbf7d0;
+  white-space: nowrap;
+  margin-top: 6px;
+  display: inline-block;
+}
+
+.btn-change-files {
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--navy);
+  box-shadow: var(--sh-xs);
+  transition: .15s;
+  white-space: nowrap;
+}
+.btn-change-files:hover {
+  background: var(--fuchsia-lt);
+  border-color: var(--fuchsia-md);
+  color: var(--fuchsia);
+}
+
+/* ── Split Workspace ────────────────────────────────────── */
+.workspace-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 29% 71%;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEFT PANEL: RULE EXPLORER (29%)
+   ═══════════════════════════════════════════════════════════ */
+.left-explorer {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+.explorer-header {
+  flex-shrink: 0;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--line);
+  background: #f9fafb;
+}
+.explorer-search {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-xs);
+  background: var(--surface);
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #111827;
+  outline: none;
+  transition: border-color .14s, box-shadow .14s;
+}
+.explorer-search::placeholder { color: #9ca3af; }
+.explorer-search:focus {
+  border-color: var(--fuchsia);
+  box-shadow: 0 0 0 2px rgba(232,0,106,0.15);
+}
+.explorer-meta-line {
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #4b5563;
+}
+
+.rule-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+.rule-list-scroll::-webkit-scrollbar { width: 5px; }
+.rule-list-scroll::-webkit-scrollbar-track { background: transparent; }
+.rule-list-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+/* Rule List Item */
+.rule-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line-lt);
+  cursor: pointer;
+  transition: background .1s;
+  user-select: none;
+  gap: 10px;
+}
+.rule-item:last-child { border-bottom: none; }
+.rule-item:nth-child(5n) { border-bottom: 2px solid var(--line); position: relative; }
+.rule-item:nth-child(5n)::after {
+  content: attr(data-row-num);
+  position: absolute;
+  right: 2px;
+  bottom: -9px;
+  font-size: 8.5px;
+  font-weight: 800;
+  color: var(--fuchsia);
+  background: var(--surface);
+  padding: 0 3px;
+  z-index: 2;
+  line-height: 1;
+  letter-spacing: .03em;
+  opacity: 0.7;
+}
+.rule-item:hover { background: var(--fuchsia-lt); }
+.rule-item.active {
+  background: #fce7f3;
+  border-left: 3px solid var(--fuchsia);
+  padding-left: 9px;
+}
+
+.ri-col-id {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--fuchsia);
+  min-width: 48px;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+}
+.ri-col-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ri-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ri-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: #4b5563;
+  font-weight: 500;
+}
+.ri-owner-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #374151;
+  background: var(--soft);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+}
+.ri-dq-tag {
+  font-size: 10px;
+  font-weight: 800;
+  color: #b91c1c;
+  background: #fef2f2;
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #ef4444;
+}
+.rule-item.has-dq { border-left: 3px solid #dc2626; }
+.dq-field-count-pill {
+  font-size: 10px;
+  font-weight: 800;
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+.ri-col-dot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-modified { background: var(--amber-dot); }
+.dot-added    { background: var(--green-dot); }
+.dot-removed  { background: var(--red-dot); }
+.dot-unchanged{ background: var(--slate-dot); }
+.dot-audit    { background: var(--info-dot); }
+.dot-dq       { background: var(--purple-dot); }
+
+.list-empty-msg {
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--light);
+  font-size: 12px;
+}
+.bulk-assign-card{margin:18px 0;padding:16px 18px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;background:rgba(255,255,255,0.03);}
+.bulk-assign-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.bulk-assign-title{font-weight:600;font-size:14px;margin-bottom:4px;}
+.bulk-assign-sub{font-size:12px;opacity:0.65;max-width:520px;}
+.bulk-assign-btns{display:flex;gap:8px;flex-shrink:0;}
+.bulk-drop{margin-top:12px;border:1px dashed rgba(255,255,255,0.2);border-radius:8px;padding:14px;text-align:center;font-size:12px;opacity:0.6;transition:.15s;}
+.bulk-drop.drag{opacity:1;border-color:rgba(120,170,255,0.6);background:rgba(120,170,255,0.06);}
+.bulk-assign-log{margin-top:12px;font-size:12px;max-height:180px;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;}
+.bulk-assign-log .ok{color:#7ee08a;}
+.bulk-assign-log .warn{color:#f0c25e;}
+.bulk-assign-log .row{padding:2px 0;}
+.module-menu-badge{display:inline-block;width:6px;height:6px;border-radius:50%;background:#7ee08a;margin-left:6px;}
+.module-menu-badge.badge-ready{background:#a3a3a3;}
+.module-menu-badge.badge-clean{background:#4ade80;}
+.module-menu-badge.badge-changes{background:#f0c25e;}
+.module-menu-badge.badge-dq{background:#dc2626;box-shadow:0 0 0 2px rgba(220,38,38,0.15);}
+.bulk-result-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;margin:3px 0;border-radius:6px;cursor:pointer;font-size:11.5px;border:1px solid transparent;}
+.bulk-result-row:hover{background:rgba(255,255,255,0.06);}
+.bulk-result-row.row-dq{border-color:#ef4444;background:rgba(239,68,68,0.08);}
+.bulk-result-row.row-changes{border-color:#f0c25e;background:rgba(240,194,94,0.08);}
+.bulk-result-row.row-clean{opacity:0.55;}
+.bulk-result-name{font-weight:700;}
+.bulk-result-counts{opacity:0.8;}
+.rule-list-total-footer {
+  display: flex;
+  justify-content: center;
+  padding: 10px 12px 14px;
+  border-top: 2px solid var(--line);
+  background: var(--soft);
+}
+.total-rows-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--fuchsia);
+  background: var(--fuchsia-lt);
+  border: 1px solid var(--fuchsia-md);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RIGHT PANEL: DETAIL VIEW (71%)
+   ═══════════════════════════════════════════════════════════ */
+.right-detail-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  min-height: 0;
+  height: 100%;
+}
+
+/* Sticky Header in Right Panel */
+.detail-sticky-head {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+  padding: 10px 20px;
+}
+.dsh-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.dsh-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+.dsh-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: #0d1b2e;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsh-id-tag {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fuchsia);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+}
+.dsh-nav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.nav-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  transition: .14s;
+}
+.nav-btn:hover:not(:disabled) {
+  background: var(--fuchsia-lt);
+  border-color: var(--fuchsia-md);
+  color: var(--fuchsia);
+}
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.nav-position-txt {
+  font-size: 11px;
+  color: #374151;
+  font-weight: 700;
+  margin: 0 4px;
+  white-space: nowrap;
+}
+
+.dsh-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+
+/* Status Badges */
+.status-pill {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.sp-modified  { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-line); }
+.sp-added     { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-line); }
+.sp-removed   { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-line); }
+.sp-unchanged { background: var(--soft);    color: var(--light); border: 1px solid var(--line); }
+.sp-audit     { background: var(--info-bg);  color: var(--info);  border: 1px solid var(--info-line); }
+.sp-dq        { background: var(--purple-bg);color: var(--purple);border: 1px solid var(--purple-line); }
+
+.dsh-flow-label { font-size: 11px; color: var(--light); font-weight: 600; }
+
+/* Scrollable Detail Body */
+.detail-scroll-pane {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 20px 48px;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+.detail-scroll-pane::-webkit-scrollbar { width: 5px; }
+.detail-scroll-pane::-webkit-scrollbar-track { background: transparent; }
+.detail-scroll-pane::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+/* Empty detail state */
+.detail-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 260px;
+  gap: 10px;
+  color: var(--light);
+  text-align: center;
+  padding: 40px;
+}
+.detail-empty-state p { font-size: 13px; color: var(--light); }
+
+/* Compact Metadata Grid */
+.meta-cards-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.meta-chip-card {
+  flex: 1;
+  min-width: 130px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  box-shadow: var(--sh-xs);
+}
+.meta-chip-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--fuchsia);
+}
+.meta-chip-value {
+  margin-top: 2px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0d1b2e;
+  word-break: break-word;
+}
+
+/* Section Header Bar */
+.section-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  margin-top: 6px;
+}
+.section-heading-text {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--fuchsia);
+}
+.diff-legend-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.diff-leg-item { display: inline-flex; align-items: center; gap: 3px; }
+.diff-leg-item b { font-weight: 800; }
+.leg-txt-added    { color: var(--green); }
+.leg-txt-removed  { color: var(--red); }
+.leg-txt-modified { color: var(--amber); }
+
+/* ── WHAT CHANGED IN PROD Table ───────────────────────────── */
+.functional-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--sh-xs);
+  margin-bottom: 14px;
+}
+.fsc-head {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
+  border-bottom: 2px solid var(--fuchsia-md);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--fuchsia-dark);
+}
+.fsc-head > div { padding: 8px 14px; }
+.fsc-head > div + div { border-left: 1px solid var(--fuchsia-md); }
+
+.fsc-row {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  border-bottom: 1px solid var(--line-lt);
+}
+.fsc-row:last-child { border-bottom: none; }
+.fsc-col-field {
+  padding: 10px 14px;
+  border-right: 1px solid var(--line-lt);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.fsc-field-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0d1b2e;
+  word-break: break-word;
+}
+.fsc-field-count {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #4b5563;
+}
+.fsc-col-changes {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.change-bullet-list { list-style: disc; margin: 0; padding-left: 16px; }
+.wc-collapse summary { cursor: pointer; list-style: none; }
+.wc-collapse summary::-webkit-details-marker { display: none; }
+.wc-collapse summary::before { content: "▸ "; color: var(--muted); }
+.wc-collapse[open] summary::before { content: "▾ "; }
+.wc-hint { font-weight: 500; color: var(--light); text-transform: none; }
+.wc-diff-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+.wc-diff-label { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+.wc-diff-body .black-value-panel { max-height: 260px; overflow: auto; font-size: 11px; }
+.change-bullet-list li { margin: 2px 0; word-break: break-word; }
+
+/* ── Actual Values Expandable Panels ─────────────────────── */
+.actual-values-section {
+  margin-bottom: 14px;
+}
+.btn-expand-actuals {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--fuchsia-md);
+  background: var(--surface);
+  color: var(--fuchsia);
+  font-size: 11.5px;
+  font-weight: 700;
+  box-shadow: var(--sh-xs);
+  transition: all .14s;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.btn-expand-actuals:hover {
+  background: var(--fuchsia-lt);
+  border-color: var(--fuchsia);
+  color: var(--fuchsia-dark);
+}
+.actuals-expanded-body {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  padding: 12px;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  box-shadow: var(--sh-xs);
+}
+
+.env-comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 0;
+}
+.env-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.env-pane-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--line-lt);
+  padding-bottom: 4px;
+}
+.env-pane-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--fuchsia);
+}
+.env-pane-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* Black Value Code Container */
+.black-value-panel {
+  padding: 10px 12px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+  border-radius: var(--r-xs);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  max-height: 220px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+.black-value-panel::-webkit-scrollbar { width: 5px; height: 5px; }
+.black-value-panel::-webkit-scrollbar-track { background: #0f172a; }
+.black-value-panel::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+/* Read-only badges/pills must never look clickable — only real
+   buttons (kpi-chip, nav-btn, btn-expand-actuals, audit-accordion-header,
+   btn-change-files, module-select-btn, btn-primary) get pointer + hover. */
+.status-pill, .meta-chip-card, .env-pill, .skipped-info-pill, .skipped-info-pill.pill-warn, .dq-side-pill,
+.direction-pill, .ri-owner-tag, .val-tag, .dsh-flow-label, .dq-badge-large,
+.status-info-title, .status-indicator-dot {
+  cursor: default;
+}
+
+/* Diff highlighting inside long raw values (Section: View actual values) */
+mark.diff-del {
+  background: rgba(239,68,68,0.32);
+  color: #fecaca;
+  text-decoration: line-through;
+  text-decoration-color: rgba(254,202,202,0.8);
+  border-radius: 2px;
+}
+mark.dq-corrupt-highlight { background: #fecaca; color: #7f1d1d; font-weight: 700; border-radius: 2px; padding: 0 1px; }
+mark.diff-add {
+  background: rgba(34,197,94,0.32);
+  color: #bbf7d0;
+  border-radius: 2px;
+}
+.diff-legend-inline {
+  display: inline-flex;
+  gap: 6px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.diff-legend-inline mark {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.val-tag {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: var(--r-xs);
+  font-size: 11px;
+  font-weight: 600;
+}
+.val-missing {
+  color: var(--light);
+  background: var(--soft);
+  border: 1px dashed var(--line);
+  font-style: italic;
+}
+.val-blank {
+  color: var(--subtle);
+  background: var(--soft);
+  border: 1px solid var(--line-lt);
+  font-style: italic;
+}
+
+/* Status Banner / Info Box */
+.status-info-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--sh-xs);
+}
+.status-info-box.added-box {
+  border-color: var(--green-line);
+  background: var(--green-bg);
+}
+.status-info-box.removed-box {
+  border-color: var(--red-line);
+  background: var(--red-bg);
+}
+.status-info-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+.added-box .status-info-title { color: var(--green); }
+.removed-box .status-info-title { color: var(--red); }
+.status-info-desc {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── Collapsible Modification Metadata ──────────────────────────────── */
+.audit-accordion {
+  margin-top: 16px;
+}
+.audit-accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  border-radius: var(--r);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  cursor: pointer;
+  transition: all .14s;
+  box-shadow: var(--sh-xs);
+}
+.audit-accordion-header:hover {
+  background: var(--blue-lt);
+  border-color: var(--blue-md);
+}
+.audit-accordion-header .chevron {
+  font-size: 13px;
+  transition: transform .18s;
+  color: var(--light);
+}
+.audit-accordion-header[aria-expanded="true"] .chevron {
+  transform: rotate(90deg);
+}
+.audit-accordion-header .audit-title { flex: 1; }
+.audit-status-tag {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.tag-has-changes {
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid var(--info-line);
+}
+.tag-no-changes {
+  background: var(--soft);
+  color: var(--light);
+  border: 1px solid var(--line-lt);
+}
+
+.audit-accordion-body {
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--surface);
+  padding: 12px 14px;
+  box-shadow: var(--sh-xs);
+}
+.audit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.audit-pane { display: flex; flex-direction: column; gap: 4px; }
+.audit-pane-head {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  border-bottom: 1px solid var(--line-lt);
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+.audit-prop {
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+}
+.audit-prop-lbl { color: var(--light); font-weight: 600; min-width: 90px; }
+.audit-prop-val { color: var(--ink); font-weight: 700; word-break: break-word; }
+
+.audit-diff-banner {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+.audit-diff-item {
+  font-size: 11.5px;
+  padding: 3px 0;
+  display: flex;
+  gap: 8px;
+}
+.audit-diff-item b { color: var(--navy); }
+.audit-diff-item span { color: var(--amber); font-weight: 600; }
+
+/* ── Enhanced Data Quality & Export Anomaly View ── */
+.dq-hero-box {
+  border: 1.5px solid #d8b4fe;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border-radius: var(--r);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--sh-xs);
+}
+.dq-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dq-hero-badge {
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #6b21a8;
+  letter-spacing: .05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dq-side-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #581c87;
+  background: #ffffff;
+  border: 1px solid #c084fc;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.dq-explanation-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #374151;
+}
+.dq-issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.dq-issue-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #fbcfe8;
+  border-left: 4px solid var(--fuchsia);
+  padding: 10px 14px;
+  border-radius: var(--r-xs);
+  box-shadow: var(--sh-xs);
+}
+.dq-issue-icon {
+  font-size: 16px;
+  color: var(--fuchsia);
+  line-height: 1;
+  margin-top: 2px;
+}
+.dq-issue-content { flex: 1; min-width: 0; }
+.dq-issue-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--navy);
+}
+.dq-issue-desc {
+  font-size: 11.5px;
+  color: var(--light);
+  margin-top: 2px;
+}
+.dq-table-container {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--surface);
+  margin-bottom: 16px;
+  box-shadow: var(--sh-xs);
+}
+.dq-table-head {
+  display: grid;
+  grid-template-columns: 190px 130px 1fr 1fr;
+  background: #f8fafc;
+  border-bottom: 1.5px solid var(--line);
+  padding: 9px 12px;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--light);
+}
+.dq-table-row {
+  display: grid;
+  grid-template-columns: 190px 130px 1fr 1fr;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line-lt);
+  align-items: start;
+  gap: 10px;
+  font-size: 12px;
+}
+.dq-table-row:last-child { border-bottom: none; }
+.dq-table-row.has-issue {
+  background: #fef2f2;
+  border-left: 4px solid #dc2626;
+}
+.dq-field-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.dq-field-badge.badge-ok {
+  background: #ecfdf5;
+  color: #15803d;
+  border: 1px solid #a7f3d0;
+}
+.dq-field-badge.badge-warn {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1.5px solid #ef4444;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.10);
+}
+.dq-issue-desc-inline {
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #991b1b;
+  line-height: 1.4;
+  max-width: 220px;
+}
+.dq-value-bad {
+  position: relative;
+  background: #fef2f2;
+  border: 1.5px solid #ef4444;
+  border-radius: 6px;
+  padding: 4px;
+}
+.dq-value-flag {
+  display: inline-block;
+  color: #dc2626;
+  font-weight: 900;
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .workspace-grid { grid-template-columns: 35% 65%; }
+  .fsc-head, .fsc-row { grid-template-columns: 180px 1fr; }
+  .dq-table-head, .dq-table-row { grid-template-columns: 140px 110px 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .workspace-grid { grid-template-columns: 1fr; }
+  .left-explorer { max-height: 40vh; }
+  .fsc-head, .fsc-row { grid-template-columns: 1fr; }
+  .fsc-col-field { border-right: none; border-bottom: 1px solid var(--line-lt); }
+  .dq-table-head, .dq-table-row { grid-template-columns: 1fr; }
+  .env-comparison-grid, .audit-grid, .upload-grid { grid-template-columns: 1fr; }
+  .topbar-badge { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Top Bar with Symbol in Top-Left and Fuchsia Pink Upper Panel -->
+  <header class="topbar">
+    <div class="logo-cluster">
+      <!-- Brand Symbol & Logo on Top Left -->
+      <div class="bn-brand-group" title="Configuration Diff Tracker">
+        <div class="bn-logo-container">
+          <svg class="bn-symbol-svg" viewBox="0 0 130 38" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Configuration Diff Tracker">
+            <!-- Particle wave above wordmark -->
+            <g class="bn-particles">
+              <circle cx="36" cy="4" r="1.1" fill="#ffffff" opacity="0.85"/>
+              <circle cx="43" cy="3" r="1.4" fill="#ffffff" opacity="0.95"/>
+              <circle cx="50" cy="2.2" r="1.7" fill="#ffffff"/>
+              <circle cx="57" cy="3" r="1.5" fill="#ffffff"/>
+              <circle cx="64" cy="4" r="1.3" fill="#ffffff"/>
+              <circle cx="71" cy="5" r="1.1" fill="#ffffff"/>
+              <circle cx="78" cy="4" r="0.9" fill="#ffffff" opacity="0.8"/>
+
+              <circle cx="30" cy="7" r="0.9" fill="#ffffff" opacity="0.7"/>
+              <circle cx="38" cy="6.8" r="1.3" fill="#ffffff"/>
+              <circle cx="46" cy="6" r="1.7" fill="#ffffff"/>
+              <circle cx="54" cy="5.2" r="2.0" fill="#ffffff"/>
+              <circle cx="62" cy="6" r="1.8" fill="#ffffff"/>
+              <circle cx="70" cy="7" r="1.4" fill="#ffffff"/>
+              <circle cx="77" cy="7.8" r="1.1" fill="#ffffff"/>
+              <circle cx="84" cy="7" r="0.9" fill="#ffffff" opacity="0.75"/>
+
+              <circle cx="34" cy="9.8" r="1.1" fill="#ffffff"/>
+              <circle cx="42" cy="9.5" r="1.5" fill="#ffffff"/>
+              <circle cx="51" cy="9" r="1.9" fill="#ffffff"/>
+              <circle cx="59" cy="9.2" r="2.1" fill="#ffffff"/>
+              <circle cx="67" cy="9.8" r="1.6" fill="#ffffff"/>
+              <circle cx="74" cy="10.2" r="1.2" fill="#ffffff"/>
+              <circle cx="81" cy="10" r="1.0" fill="#ffffff"/>
+            </g>
+            <!-- CONF DIFF text -->
+            <text x="58" y="22.5" text-anchor="middle" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-weight="900" font-size="11.5" fill="#ffffff" letter-spacing="1.2">CONF</text>
+            <text x="58" y="34" text-anchor="middle" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-weight="900" font-size="10" fill="#ffffff" letter-spacing="1.8">DIFF</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="topbar-divider"></div>
+
+      <!-- Module / Table Dropdown in Top Bar -->
+      <div class="module-switch-wrapper" id="topbarModuleSwitch">
+        <button class="module-select-btn" id="topbarModuleBtn" type="button" aria-haspopup="listbox" aria-expanded="false" title="Switch table / module (← / →)">
+          <span id="topbarModuleLabel">PMR</span>
+          <span class="caret">▼</span>
+        </button>
+        <div class="module-dropdown-menu hidden" id="topbarModuleMenu" role="listbox"></div>
+      </div>
+
+      <div class="logo-text">
+        <span class="sub-txt">CONFIGURATION COMPARISON TOOL</span>
+      </div>
+    </div>
+    <!-- Engine Seal: [BSN-CORE-42656173744f6653796e] BeastOfSyn -->
+    <div class="topbar-right-group">
+      <div class="topbar-author-badge" title="Author">
+        <span class="topbar-author-label">By:</span> BeastOfSyn
+      </div>
+      <div class="topbar-badge" data-engine-seal="BSN-CORE-42656173744f6653796e" title="Migration Audit Engine">MIGRATION AUDIT</div>
+    </div>
+  </header>
+
+  <!-- Upload Screen -->
+  <main class="upload-screen" id="uploadScreen">
+    <div class="upload-inner">
+      <div class="upload-header-row">
+        <div>
+          <div class="eyebrow" id="uploadEyebrow">PMR MODULE</div>
+          <div class="hero">
+            <h1 id="heroTitle">Compare PMR configurations<br>with clarity.</h1>
+            <p>Select the Phase 2 / DEV export and June25 / PROD export for this module. All modules preserve their state in memory.</p>
+          </div>
+        </div>
+        <div class="module-switch-wrapper" id="uploadModuleSwitch">
+          <button class="module-select-btn tb-module-btn" id="uploadModuleBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span id="uploadModuleLabel">PMR</span>
+            <span class="caret">▼</span>
+          </button>
+          <div class="module-dropdown-menu hidden" id="uploadModuleMenu" role="listbox"></div>
+        </div>
+      </div>
+
+      <div class="upload-grid">
+        <!-- DEV Card -->
+        <div class="upload-card">
+          <div class="env-head">
+            <span class="env-name">DEV · Baseline</span>
+            <span class="env-pill">Phase 2</span>
+          </div>
+          <div class="drop" id="devDrop">
+            <input id="devFile" type="file" accept=".xlsx,.xls,.csv">
+            <div class="upload-icon">📄</div>
+            <div class="drop-title">Drop DEV Excel file here</div>
+            <div class="drop-sub">or click to browse (.xlsx, .xls)</div>
+          </div>
+          <div class="file-selected hidden" id="devSelected">
+            <div class="selected-icon">✓</div>
+            <div class="selected-name" id="devName"></div>
+            <div class="selected-badge">Ready</div>
+            <div class="file-actions">
+              <button type="button" class="btn-change" id="devChange">⟳ Change</button>
+              <button type="button" class="btn-remove" id="devRemove">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROD Card -->
+        <div class="upload-card">
+          <div class="env-head">
+            <span class="env-name">PROD · Audited</span>
+            <span class="env-pill">June25</span>
+          </div>
+          <div class="drop" id="prodDrop">
+            <input id="prodFile" type="file" accept=".xlsx,.xls,.csv">
+            <div class="upload-icon">📄</div>
+            <div class="drop-title">Drop PROD Excel file here</div>
+            <div class="drop-sub">or click to browse (.xlsx, .xls)</div>
+          </div>
+          <div class="file-selected hidden" id="prodSelected">
+            <div class="selected-icon">✓</div>
+            <div class="selected-name" id="prodName"></div>
+            <div class="selected-badge">Ready</div>
+            <div class="file-actions">
+              <button type="button" class="btn-change" id="prodChange">⟳ Change</button>
+              <button type="button" class="btn-remove" id="prodRemove">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bulk-assign-card" id="bulkAssignCard">
+        <div class="bulk-assign-head">
+          <div>
+            <div class="bulk-assign-title">⚡ Bulk Auto-Assign</div>
+            <div class="bulk-assign-sub">Drop every module's DEV/PROD Excel files at once (or pick a folder) — each file is matched to its module and slot by filename, no manual per-module dragging.</div>
+          </div>
+          <div class="bulk-assign-btns">
+            <button type="button" class="btn-secondary" id="bulkPickFiles">Choose Files</button>
+            <button type="button" class="btn-secondary" id="bulkPickFolder">Choose Folder</button>
+          </div>
+          <input type="file" id="bulkFileInput" multiple accept=".xlsx,.xls,.csv" class="hidden">
+          <input type="file" id="bulkFolderInput" webkitdirectory directory multiple class="hidden">
+        </div>
+        <div class="bulk-drop" id="bulkDropZone">Or drop files / a folder here</div>
+        <div class="bulk-assign-log hidden" id="bulkAssignLog"></div>
+      </div>
+
+      <div class="compare-area">
+        <div class="compare-actions-row">
+          <button class="btn-primary" id="compareBtn" disabled>Compare Rules</button>
+          <button type="button" class="btn-secondary hidden" id="backToResultsBtn">↩ Return to Previous Results</button>
+        </div>
+        <div class="helper-txt">Verdict is strictly relative to PROD. State is maintained independently per module.</div>
+      </div>
+      <div id="errorBanner" class="error-banner hidden"></div>
+    </div>
+  </main>
+
+  <!-- Results Screen -->
+  <main class="results-screen hidden" id="resultsScreen">
+
+    <!-- Results Toolbar -->
+    <div class="results-toolbar">
+      <div class="toolbar-left-group">
+        <!-- Module Selector Dropdown -->
+        <div class="module-switch-wrapper" id="resultsModuleSwitch">
+          <button class="module-select-btn tb-module-btn" id="resultsModuleBtn" type="button" aria-haspopup="listbox" aria-expanded="false" title="Switch table / module (← / →)">
+            <span id="resultsModuleLabel">PMR</span>
+            <span class="caret">▼</span>
+          </button>
+          <div class="module-dropdown-menu hidden" id="resultsModuleMenu" role="listbox"></div>
+        </div>
+
+        <div class="direction-pill">
+          <span>DEV · Baseline</span>
+          <span class="arr">→</span>
+          <span>PROD · Audited</span>
+        </div>
+
+        <!-- Summary KPI Chips -->
+        <div class="kpi-chips-container" id="kpiChipsContainer"></div>
+
+        <!-- Skipped note (if any) -->
+        <div class="skipped-info-pill hidden" id="skippedInfoPill"></div>
+        <div class="skipped-info-detail hidden" id="skippedInfoDetail"></div>
+        <div class="recovered-info-pill hidden" id="recoveredInfoPill"></div>
+      </div>
+
+      <button type="button" class="btn-change-files" id="changeFilesBtn">＋ Change files</button>
+    </div>
+
+    <!-- Workspace (Left Explorer + Right Detail) -->
+    <div class="workspace-grid">
+
+      <!-- Left: Rule Explorer -->
+      <section class="left-explorer" aria-label="Rule Explorer">
+        <div class="explorer-header">
+          <input class="explorer-search" id="ruleSearchInput" placeholder="Search by ID, name or owner…" autocomplete="off" />
+          <div class="explorer-meta-line">
+            <span id="explorerCountLabel">0 rules</span>
+          </div>
+        </div>
+
+        <div class="rule-list-scroll" id="ruleListContainer" role="listbox" tabindex="0"></div>
+      </section>
+
+      <!-- Right: Detail Panel -->
+      <section class="right-detail-panel" aria-label="Rule Detail">
+        <div class="detail-sticky-head hidden" id="stickyDetailHead"></div>
+
+        <div class="detail-scroll-pane" id="detailScrollPane">
+          <div class="detail-empty-state" id="detailEmptyState">
+            <p>Select an entry from the left explorer to view differences.</p>
+          </div>
+          <div id="detailContentPane" class="hidden"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="app-trademark-watermark">
+    <span class="tm-symbol">™</span> Configuration Comparison Tool · <span>© BeastOfSyn</span>
+  </div>
+</div>
+<script>
+
+const MODULES = [
+  { id: 'pmr', label: 'PMR' },
+  { id: 'alert_rule', label: 'Alert Rule' },
+  { id: 'process', label: 'Process' },
+  { id: 'translator_actions', label: 'Translator Actions' },
+  { id: 'translators', label: 'Translators' },
+  { id: 'cis_job', label: 'CIS Job' },
+  { id: 'bre', label: 'BRE' },
+  { id: 'rrd', label: 'RRD' },
+  { id: 'user_layout', label: 'User Layout' },
+  { id: 'assignment_rule', label: 'Assignment Rule' },
+  { id: 'template_master', label: 'Template Master' },
+  { id: 'layout_group_view', label: 'Layout Group View' }
+];
+
+const state = Object.fromEntries(
+  MODULES.map(m => [
+    m.id,
+    {
+      devFile: null,
+      prodFile: null,
+      result: null,
+      filter: 'MODIFIED',
+      search: '',
+      selected: 0,
+      dqSelected: 0,
+      expandedActuals: {},
+      auditOpen: false,
+      isComparing: false
+    }
+  ])
+);
+
+let currentModule = 'pmr';
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
+const cur = () => state[currentModule];
+
+function statusKey(r) {
+  const s = String(r?.status || '').toUpperCase();
+  if (s.includes('DATA_QUALITY')) return 'DATA_QUALITY';
+  if (s.includes('MODIFIED')) return 'MODIFIED';
+  if (s.includes('ADDED')) return 'ADDED';
+  if (s.includes('REMOVED') || s.includes('DELETED')) return 'REMOVED';
+  return 'UNCHANGED';
+}
+
+function moduleLabel(id) {
+  return MODULES.find(m => m.id === id)?.label || id;
+}
+
+function getRuleDisplayId(r) {
+  if (!r) return 'Entry';
+  if (r.key && Array.isArray(r.key)) {
+    if (r.key.length >= 2) {
+      return String(r.key[1]);
+    }
+    if (r.key.length === 1) {
+      return String(r.key[0]);
+    }
+  }
+  const str = String(r.key_display || r.name || 'Entry');
+  return str.replace(/^RuleID\s*:\s*/i, '').replace(/^ProcessID\s*:\s*/i, '');
+}
+
+function getOwnerBadgeText(r) {
+  if (!r) return '';
+  if (r.owner_hidden || r.owner_id == null || String(r.owner_id).trim() === '' || Number(r.owner_id) === 477) {
+    return '';
+  }
+  return `Owner ${r.owner_id}`;
+}
+
+/* ── Module Switching & Dropdowns ────────────────────────── */
+function updateHeaderLabels() {
+  const label = moduleLabel(currentModule);
+  $('topbarModuleLabel').textContent = label;
+  $('uploadEyebrow').textContent = `${label.toUpperCase()} MODULE`;
+  $('uploadModuleLabel').textContent = label;
+  $('resultsModuleLabel').textContent = label;
+  $('heroTitle').innerHTML = `Compare ${esc(label)} configurations<br>with clarity.`;
+  document.title = `${label} — Configuration Comparison Tool`;
+  renderDropdownMenus();
+}
+
+function moduleBadge(m) {
+  const st = state[m.id];
+  const sum = st.result?.summary;
+  if (sum) {
+    // Compared: colour-code by what was found, worst-first, so a scan of
+    // the menu tells you which modules need attention without opening each.
+    if (sum.data_quality > 0) return `<span class="module-menu-badge badge-dq" title="${sum.data_quality} data quality issue(s)"></span>`;
+    if (sum.modified > 0 || sum.added > 0 || sum.removed > 0) return `<span class="module-menu-badge badge-changes" title="${sum.modified + sum.added + sum.removed} change(s)"></span>`;
+    return `<span class="module-menu-badge badge-clean" title="No differences found"></span>`;
+  }
+  if (st.devFile && st.prodFile) return '<span class="module-menu-badge badge-ready" title="Both files assigned, not compared yet"></span>';
+  return '';
+}
+
+function renderDropdownMenus() {
+  const buildMenu = () => MODULES.map(m => `
+    <button type="button" data-module="${m.id}" class="${m.id === currentModule ? 'active' : ''}">
+      <span>${esc(m.label)}</span>
+      ${moduleBadge(m)}
+      ${m.id === currentModule ? '<span class="menu-check">✓</span>' : ''}
+    </button>
+  `).join('');
+
+  $('topbarModuleMenu').innerHTML = buildMenu();
+  $('uploadModuleMenu').innerHTML = buildMenu();
+  $('resultsModuleMenu').innerHTML = buildMenu();
+
+  const attachEvents = menuId => {
+    $(menuId).querySelectorAll('button').forEach(b => {
+      b.onclick = e => {
+        e.stopPropagation();
+        switchModule(b.dataset.module);
+        closeAllDropdowns();
+      };
+    });
+  };
+
+  attachEvents('topbarModuleMenu');
+  attachEvents('uploadModuleMenu');
+  attachEvents('resultsModuleMenu');
+}
+
+function closeAllDropdowns() {
+  $('topbarModuleMenu').classList.add('hidden');
+  $('uploadModuleMenu').classList.add('hidden');
+  $('resultsModuleMenu').classList.add('hidden');
+  $('topbarModuleBtn').setAttribute('aria-expanded', 'false');
+  $('uploadModuleBtn').setAttribute('aria-expanded', 'false');
+  $('resultsModuleBtn').setAttribute('aria-expanded', 'false');
+}
+
+function toggleDropdown(btnId, menuId) {
+  const menu = $(menuId);
+  const isOpen = !menu.classList.contains('hidden');
+  closeAllDropdowns();
+  if (!isOpen) {
+    menu.classList.remove('hidden');
+    $(btnId).setAttribute('aria-expanded', 'true');
+  }
+}
+
+$('topbarModuleBtn').onclick = e => {
+  e.stopPropagation();
+  toggleDropdown('topbarModuleBtn', 'topbarModuleMenu');
+};
+
+$('uploadModuleBtn').onclick = e => {
+  e.stopPropagation();
+  toggleDropdown('uploadModuleBtn', 'uploadModuleMenu');
+};
+
+$('resultsModuleBtn').onclick = e => {
+  e.stopPropagation();
+  toggleDropdown('resultsModuleBtn', 'resultsModuleMenu');
+};
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.module-switch-wrapper')) {
+    closeAllDropdowns();
+  }
+});
+
+function switchModule(id) {
+  if (!MODULES.some(m => m.id === id) || id === currentModule) return;
+  currentModule = id;
+  updateHeaderLabels();
+  const s = cur();
+  paintFile('dev', s.devFile);
+  paintFile('prod', s.prodFile);
+  $('ruleSearchInput').value = s.search || '';
+  if (s.result && !s.isComparing) {
+    showResultsScreen();
+  } else {
+    showUploadScreen();
+  }
+}
+
+function cycleModule(delta) {
+  const idx = MODULES.findIndex(m => m.id === currentModule);
+  const nextIdx = (idx + delta + MODULES.length) % MODULES.length;
+  switchModule(MODULES[nextIdx].id);
+}
+
+/* ── Upload Handling ─────────────────────────────────────── */
+function paintFile(slot, file) {
+  const drop = $(slot + 'Drop');
+  const sel = $(slot + 'Selected');
+  const name = $(slot + 'Name');
+  if (file) {
+    name.textContent = file.name;
+    drop.classList.add('hidden');
+    sel.classList.remove('hidden');
+  } else {
+    name.textContent = '';
+    sel.classList.add('hidden');
+    drop.classList.remove('hidden');
+  }
+}
+
+function updateCompareButton() {
+  const s = cur();
+  if (s.isComparing) {
+    $('compareBtn').disabled = true;
+    $('compareBtn').textContent = 'Comparing…';
+  } else {
+    $('compareBtn').disabled = !(s.devFile && s.prodFile);
+    $('compareBtn').textContent = 'Compare Rules';
+  }
+}
+
+function setupUploadZone(slot) {
+  const input = $(slot + 'File');
+  const drop = $(slot + 'Drop');
+  const changeBtn = $(slot + 'Change');
+  const removeBtn = $(slot + 'Remove');
+
+  const setFile = file => {
+    cur()[slot + 'File'] = file || null;
+    input.value = '';
+    paintFile(slot, cur()[slot + 'File']);
+    updateCompareButton();
+  };
+
+  input.addEventListener('change', () => setFile(input.files[0] || null));
+  drop.addEventListener('click', () => input.click());
+  changeBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    input.click();
+  });
+  removeBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    setFile(null);
+  });
+
+  const card = drop.closest('.upload-card');
+  ['dragenter', 'dragover'].forEach(ev => card.addEventListener(ev, e => {
+    e.preventDefault();
+    drop.classList.add('drag');
+  }));
+  ['dragleave', 'drop'].forEach(ev => card.addEventListener(ev, e => {
+    e.preventDefault();
+    drop.classList.remove('drag');
+  }));
+  card.addEventListener('drop', e => {
+    const f = e.dataTransfer.files[0];
+    if (f) setFile(f);
+  });
+}
+
+setupUploadZone('dev');
+setupUploadZone('prod');
+
+/* ── Bulk Auto-Assign: drop a folder/pile of Excel files, each one gets
+   matched to its module + DEV/PROD slot by filename, instead of manually
+   dragging into 12 modules × 2 slots one at a time. ─────────────────── */
+const MODULE_ALIASES = {
+  pmr: ['pmr'],
+  alert_rule: ['alert_rule', 'alertrule', 'alert'],
+  process: ['process', 'proc'],
+  translator_actions: ['translator_actions', 'translatoractions', 'transaction_action', 'transactions'],
+  translators: ['translators', 'translator'],
+  cis_job: ['cis_job', 'cisjob', 'cis'],
+  bre: ['bre'],
+  rrd: ['rrd'],
+  user_layout: ['user_layout', 'userlayout', 'ulm'],
+  assignment_rule: ['assignment_rule', 'assignmentrule', 'assignment', 'ar'],
+  template_master: ['template_master', 'templatemaster', 'template', 'tm'],
+  layout_group_view: ['layout_group_view', 'layoutgroupview', 'layoutgroup', 'lgv']
+};
+
+function normalizeName(name) {
+  return name.toLowerCase().replace(/\.[^.]+$/, '').replace(/[^a-z0-9]/g, '');
+}
+
+// Returns { moduleId, env, reason } or { moduleId: null, reason } if it
+// can't confidently place the file — never guesses silently wrong.
+function matchFileToSlot(filename) {
+  const norm = normalizeName(filename);
+
+  let bestModule = null, bestLen = 0;
+  for (const [modId, aliases] of Object.entries(MODULE_ALIASES)) {
+    for (const alias of aliases) {
+      const a = alias.replace(/[^a-z0-9]/g, '');
+      // Short codes (<=3 chars, e.g. "ar", "tm", "ulm") only count as a
+      // filename PREFIX — matches your real naming (ARJun25, TMPhase2) while
+      // refusing to match "ar" buried inside an unrelated word like "chart".
+      const isRealMatch = a.length <= 3 ? norm.startsWith(a) : norm.includes(a);
+      if (isRealMatch && a.length > bestLen) { bestModule = modId; bestLen = a.length; }
+    }
+  }
+
+  const hasDev = /(^|[a-z])dev([a-z]|$)/.test(norm) || norm.includes('dev');
+  const hasProd = norm.includes('prod') || norm.includes('prd');
+  // Site-specific convention: "Jun25"-style month+year tags mean PROD,
+  // "PhaseN" tags mean DEV — in addition to literal dev/prod filenames.
+  const hasMonthYear = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\d{2}/.test(norm);
+  const hasPhase = /phase\d/.test(norm);
+  const devSignal = hasDev || hasPhase;
+  const prodSignal = hasProd || hasMonthYear;
+
+  if (!bestModule) return { moduleId: null, env: null, reason: `no module name found in "${filename}"` };
+  if (devSignal && prodSignal) return { moduleId: null, env: null, reason: `"${filename}" mentions both DEV and PROD markers — ambiguous` };
+  if (!devSignal && !prodSignal) return { moduleId: null, env: null, reason: `"${filename}" matched module "${moduleLabel(bestModule)}" but no DEV/PROD marker found` };
+  return { moduleId: bestModule, env: devSignal ? 'dev' : 'prod' };
+}
+
+async function processBulkFiles(files) {
+  const xlsxFiles = Array.from(files).filter(f => /\.(xlsx?|csv)$/i.test(f.name));
+  const log = [];
+  let assigned = 0;
+
+  for (const file of xlsxFiles) {
+    const { moduleId, env, reason } = matchFileToSlot(file.name);
+    if (!moduleId) {
+      log.push(`<div class="row warn">⚠ ${esc(file.name)} — ${esc(reason)}, place manually</div>`);
+      continue;
+    }
+    state[moduleId][env + 'File'] = file;
+    assigned++;
+    log.push(`<div class="row ok">✓ ${esc(file.name)} → ${esc(moduleLabel(moduleId))} · ${env.toUpperCase()}</div>`);
+  }
+
+  if (xlsxFiles.length === 0) {
+    log.push(`<div class="row warn">⚠ No .xlsx/.xls/.csv files found in what was dropped</div>`);
+  }
+
+  const logEl = $('bulkAssignLog');
+  logEl.innerHTML = `<div class="row" style="opacity:.7;margin-bottom:6px;">${assigned}/${xlsxFiles.length} files assigned — comparing…</div>` + log.join('');
+  logEl.classList.remove('hidden');
+
+  paintFile('dev', cur().devFile);
+  paintFile('prod', cur().prodFile);
+  updateCompareButton();
+  renderDropdownMenus();
+
+  // Auto-compare every module that now has both DEV and PROD ready - the
+  // whole point is drop-and-done, not drop-then-click-compare-12-times.
+  const ready = MODULES.filter(m => state[m.id].devFile && state[m.id].prodFile && !state[m.id].result);
+  let done = 0, failed = 0;
+  for (const m of ready) {
+    const outcome = await runCompareForModule(m.id);
+    if (outcome && outcome.ok) done++; else failed++;
+    if (currentModule === m.id) {
+      if (outcome && outcome.ok) showResultsScreen();
+      else if (outcome) { $('errorBanner').textContent = outcome.error; $('errorBanner').classList.remove('hidden'); }
+      updateCompareButton();
+    }
+    renderDropdownMenus();
+  }
+
+  // Per-module results table, click straight into whichever module needs
+  // attention instead of clicking through the dropdown one by one.
+  const resultRows = MODULES.filter(m => state[m.id].result).map(m => {
+    const sum = state[m.id].result.summary;
+    const worst = sum.data_quality > 0 ? 'row-dq' : (sum.modified + sum.added + sum.removed > 0) ? 'row-changes' : 'row-clean';
+    return `<div class="bulk-result-row ${worst}" data-jump="${m.id}">
+      <span class="bulk-result-name">${esc(m.label)}</span>
+      <span class="bulk-result-counts">${sum.modified} mod · ${sum.added} add · ${sum.removed} rem${sum.data_quality > 0 ? ` · <b>${sum.data_quality} DQ</b>` : ''}</span>
+    </div>`;
+  }).join('');
+
+  const summary = ready.length
+    ? `<div class="row" style="opacity:.7;margin:6px 0;">${done} module(s) compared${failed ? `, ${failed} failed` : ''} — click a module below to jump to its results</div>${resultRows}`
+    : '';
+  logEl.innerHTML = `<div class="row" style="opacity:.7;margin-bottom:6px;">${assigned}/${xlsxFiles.length} files assigned</div>` + log.join('') + summary;
+  logEl.querySelectorAll('.bulk-result-row').forEach(row => {
+    row.addEventListener('click', () => switchModule(row.dataset.jump));
+  });
+}
+
+$('bulkPickFiles').addEventListener('click', () => $('bulkFileInput').click());
+$('bulkPickFolder').addEventListener('click', () => $('bulkFolderInput').click());
+$('bulkFileInput').addEventListener('change', e => { processBulkFiles(e.target.files); e.target.value = ''; });
+$('bulkFolderInput').addEventListener('change', e => { processBulkFiles(e.target.files); e.target.value = ''; });
+
+const bulkDrop = $('bulkDropZone');
+['dragenter', 'dragover'].forEach(ev => bulkDrop.addEventListener(ev, e => {
+  e.preventDefault(); bulkDrop.classList.add('drag');
+}));
+['dragleave', 'drop'].forEach(ev => bulkDrop.addEventListener(ev, e => {
+  e.preventDefault(); bulkDrop.classList.remove('drag');
+}));
+bulkDrop.addEventListener('drop', async e => {
+  e.preventDefault();
+  const items = e.dataTransfer.items;
+  if (items && items.length && items[0].webkitGetAsEntry) {
+    // Recurse into dropped folders, not just flat files.
+    const collected = [];
+    const walk = entry => new Promise(resolve => {
+      if (entry.isFile) {
+        entry.file(f => { collected.push(f); resolve(); });
+      } else if (entry.isDirectory) {
+        entry.createReader().readEntries(async entries => {
+          await Promise.all(entries.map(walk));
+          resolve();
+        });
+      } else resolve();
+    });
+    await Promise.all(Array.from(items).map(it => {
+      const entry = it.webkitGetAsEntry && it.webkitGetAsEntry();
+      return entry ? walk(entry) : Promise.resolve();
+    }));
+    processBulkFiles(collected);
+  } else {
+    processBulkFiles(e.dataTransfer.files);
+  }
+});
+
+async function runCompareForModule(modId) {
+  const s = state[modId];
+  if (!s.devFile || !s.prodFile || s.isComparing) return;
+  s.isComparing = true;
+  const formData = new FormData();
+  formData.append('dev_file', s.devFile);
+  formData.append('prod_file', s.prodFile);
+  try {
+    const res = await fetch(`/api/compare/${modId}`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Comparison failed.');
+    s.result = data;
+    s.filter = 'MODIFIED';
+    s.search = '';
+    s.selected = 0;
+    s.dqSelected = 0;
+    s.expandedActuals = {};
+    s.auditOpen = false;
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message || 'Comparison request failed.' };
+  } finally {
+    s.isComparing = false;
+  }
+}
+
+$('compareBtn').onclick = async () => {
+  const modToCompare = currentModule;
+  if (state[modToCompare].isComparing) return;
+  $('errorBanner').classList.add('hidden');
+  $('compareBtn').disabled = true;
+  $('compareBtn').textContent = 'Comparing…';
+  const outcome = await runCompareForModule(modToCompare);
+  if (currentModule === modToCompare) {
+    if (outcome && outcome.ok) {
+      showResultsScreen();
+    } else if (outcome) {
+      $('errorBanner').textContent = outcome.error;
+      $('errorBanner').classList.remove('hidden');
+    }
+    updateCompareButton();
+  }
+};
+
+$('changeFilesBtn').onclick = () => showUploadScreen();
+
+const backBtn = $('backToResultsBtn');
+if (backBtn) {
+  backBtn.onclick = () => {
+    if (cur().result) {
+      showResultsScreen();
+    }
+  };
+}
+
+function showUploadScreen() {
+  const s = cur();
+  $('resultsScreen').classList.add('hidden');
+  $('uploadScreen').classList.remove('hidden');
+  paintFile('dev', s.devFile);
+  paintFile('prod', s.prodFile);
+  $('errorBanner').classList.add('hidden');
+  updateCompareButton();
+
+  const returnBtn = $('backToResultsBtn');
+  if (returnBtn) {
+    if (s.result) {
+      returnBtn.textContent = `↩ Return to ${moduleLabel(currentModule)} Results`;
+      returnBtn.classList.remove('hidden');
+    } else {
+      returnBtn.classList.add('hidden');
+    }
+  }
+}
+
+function showResultsScreen() {
+  const s = cur();
+  $('uploadScreen').classList.add('hidden');
+  $('resultsScreen').classList.remove('hidden');
+  $('ruleSearchInput').value = s.search || '';
+  renderSummaryChips();
+  renderRuleList();
+}
+
+/* ── Results & Chips ─────────────────────────────────────── */
+function renderSummaryChips() {
+  const s = cur().result?.summary;
+  if (!s) return;
+
+  const chipsDef = [
+    { label: 'MODIFIED IN PROD', count: s.modified, filter: 'MODIFIED', cls: 'active-modified' },
+    { label: 'ADDED TO PROD', count: s.added, filter: 'ADDED', cls: 'active-added' },
+    { label: 'REMOVED FROM PROD', count: s.removed, filter: 'REMOVED', cls: 'active-removed' },
+    { label: 'AUDIT ONLY', count: s.audit_only, filter: 'AUDIT-ONLY', cls: 'active-audit' },
+    { label: 'DATA QUALITY', count: s.data_quality, filter: 'DATA_QUALITY', cls: 'active-dq' },
+    { label: 'ALL', count: s.total, filter: 'ALL', cls: '' }
+  ];
+
+  $('kpiChipsContainer').innerHTML = chipsDef.map(d => `
+    <button type="button" class="kpi-chip ${d.cls} ${cur().filter === d.filter ? 'active' : ''}" data-filter="${d.filter}">
+      <span class="chip-count">${d.count}</span>
+      <span>${d.label}</span>
+    </button>
+  `).join('');
+
+  $('kpiChipsContainer').querySelectorAll('.kpi-chip').forEach(btn => {
+    btn.onclick = () => {
+      cur().filter = btn.dataset.filter;
+      cur().selected = 0;
+      cur().dqSelected = 0;
+      renderSummaryChips();
+      renderRuleList();
+    };
+  });
+
+  const totalSkipped = (s.skipped_dev || 0) + (s.skipped_prod || 0);
+  const skipPill = $('skippedInfoPill');
+  const skipDetail = $('skippedInfoDetail');
+
+  const totalRecovered = (s.recovered_dev || 0) + (s.recovered_prod || 0);
+  const recoveredPill = $('recoveredInfoPill');
+  if (recoveredPill) {
+    if (totalRecovered > 0) {
+      recoveredPill.textContent = `✓ ${totalRecovered} rows recovered — a key field was missing but the row was still uniquely matched by its other fields (${s.recovered_dev || 0} DEV / ${s.recovered_prod || 0} PROD)`;
+      recoveredPill.classList.remove('hidden');
+    } else {
+      recoveredPill.classList.add('hidden');
+    }
+  }
+
+  if (totalSkipped > 0) {
+    // Rough attempt-rate: skipped rows vs (skipped + successfully-keyed rows).
+    // High ratio (>25%) means this isn't a few stray blanks - it's systemic
+    // export corruption (e.g. Excel's 32,767-char cell limit splitting XML
+    // across rows) and deserves a loud flag, not the same quiet gray pill
+    // used for a handful of genuinely blank rows.
+    const attempted = totalSkipped + s.total;
+    const ratio = attempted > 0 ? totalSkipped / attempted : 0;
+    const isSevere = ratio >= 0.25;
+    skipPill.textContent = isSevere
+      ? `⚠ ${totalSkipped} rows skipped (${Math.round(ratio * 100)}%) — likely export corruption, not just blank keys (${s.skipped_dev || 0} DEV / ${s.skipped_prod || 0} PROD) — click for breakdown ▸`
+      : `${totalSkipped} rows skipped — blank key (${s.skipped_dev || 0} DEV / ${s.skipped_prod || 0} PROD) — click for breakdown ▸`;
+    skipPill.classList.toggle('pill-warn', isSevere);
+    skipPill.classList.remove('hidden');
+
+    // Breakdown by field, shown inline on click (was hover-only before —
+    // invisible unless you knew to look, easy to miss on a 69% skip rate).
+    const devR = s.skipped_dev_reasons || {}, prodR = s.skipped_prod_reasons || {};
+    const allReasons = [...Object.entries(devR).map(([k,v]) => ['DEV', k, v]), ...Object.entries(prodR).map(([k,v]) => ['PROD', k, v])];
+    const truncationCount = allReasons.filter(([,k]) => k.includes('likely_truncation')).reduce((a,[,,v]) => a+v, 0);
+    const brokenCount = allReasons.filter(([,k]) => k.includes('no_oversized_field')).reduce((a,[,,v]) => a+v, 0);
+    const verdict = truncationCount > brokenCount
+      ? `Mostly <b>Excel cell-limit truncation</b> (${truncationCount} vs ${brokenCount}) — a real row is being split across multiple continuation rows on export because one field (likely an XML/JSON blob) hits Excel's 32,767-char cell limit. Re-export without hitting that limit, or via CSV.`
+      : brokenCount > truncationCount
+      ? `Mostly <b>no oversized field nearby</b> (${brokenCount} vs ${truncationCount}) — this doesn't match the truncation pattern. Points to a broken/partial/filtered export. Re-pull from source rather than trying to fix this file.`
+      : `Mixed signal (${truncationCount} truncation-tagged vs ${brokenCount} not) — check both causes.`;
+    skipDetail.innerHTML = allReasons.length
+      ? `<div class="skip-verdict">${verdict}</div><div class="skip-reason-list">${allReasons.map(([side,k,v]) => `<div class="skip-reason-row">${side}: ${esc(k)} — <b>${v}</b></div>`).join('')}</div>`
+      : '';
+    skipPill.onclick = () => skipDetail.classList.toggle('hidden');
+  } else {
+    skipPill.classList.add('hidden');
+    skipDetail.classList.add('hidden');
+  }
+}
+
+/* ── Rule Explorer List ──────────────────────────────────── */
+function getFilteredEntries() {
+  const s = cur();
+  const res = s.result;
+  if (!res) return [];
+
+  if (s.filter === 'DATA_QUALITY') {
+    return res.data_quality || [];
+  }
+
+  let list = res.rules || [];
+  if (s.filter === 'AUDIT-ONLY') {
+    list = list.filter(r => r.audit_only);
+  } else if (s.filter !== 'ALL') {
+    list = list.filter(r => statusKey(r) === s.filter);
+  }
+
+  const q = (s.search || '').trim().toLowerCase();
+  if (!q) return list;
+
+  return list.filter(r => {
+    const kDisp = String(r.key_display || '').toLowerCase();
+    const name = String(r.name || '').toLowerCase();
+    const owner = String(r.owner_id ?? '').toLowerCase();
+    const keyVal = Array.isArray(r.key) ? r.key.join(' ').toLowerCase() : '';
+    return kDisp.includes(q) || name.includes(q) || owner.includes(q) || keyVal.includes(q);
+  });
+}
+
+$('ruleSearchInput').addEventListener('input', () => {
+  cur().search = $('ruleSearchInput').value;
+  cur().selected = 0;
+  cur().dqSelected = 0;
+  renderRuleList();
+});
+
+function getStatusDotClass(r) {
+  const k = statusKey(r);
+  if (k === 'MODIFIED') return 'dot-modified';
+  if (k === 'ADDED') return 'dot-added';
+  if (k === 'REMOVED') return 'dot-removed';
+  if (k === 'DATA_QUALITY') return 'dot-dq';
+  if (r.audit_only) return 'dot-audit';
+  return 'dot-unchanged';
+}
+
+function renderRuleList() {
+  const arr = getFilteredEntries();
+  const isDq = cur().filter === 'DATA_QUALITY';
+  const countLabel = isDq ? `${arr.length} ${arr.length === 1 ? 'issue' : 'issues'}` : `${arr.length} ${arr.length === 1 ? 'rule' : 'rules'}`;
+  $('explorerCountLabel').textContent = countLabel;
+
+  if (!arr.length) {
+    $('ruleListContainer').innerHTML = '<div class="list-empty-msg">No entries match the current filter or search.</div>';
+    clearDetailView();
+    return;
+  }
+
+  const selectedIdx = isDq ? cur().dqSelected : cur().selected;
+  const safeIdx = Math.max(0, Math.min(selectedIdx, arr.length - 1));
+  if (isDq) cur().dqSelected = safeIdx;
+  else cur().selected = safeIdx;
+
+  $('ruleListContainer').innerHTML = arr.map((r, i) => {
+    const cleanId = getRuleDisplayId(r);
+    const ownerTxt = getOwnerBadgeText(r);
+    const dqSnippet = isDq && r.dq_reasons?.length
+      ? `<span class="ri-dq-tag">⚠ ${esc(r.dq_reasons[0])}</span>${r.data_quality_flags > 1 ? `<span class="dq-field-count-pill">+${r.data_quality_flags - 1} more</span>` : ''}`
+      : '';
+
+    return `
+      <div class="rule-item ${i === safeIdx ? 'active' : ''}${isDq ? ' has-dq' : ''}" data-i="${i}" data-row-num="${(i+1) % 5 === 0 ? (i+1) : ''}" role="option" aria-selected="${i === safeIdx}">
+        <div class="ri-col-id">${esc(cleanId)}</div>
+        <div class="ri-col-main">
+          <div class="ri-name" title="${esc(r.name || 'Entry')}">${esc(r.name || 'Entry')}</div>
+          <div class="ri-sub">
+            ${ownerTxt ? `<span class="ri-owner-tag">${esc(ownerTxt)}</span>` : ''}
+            ${dqSnippet}
+          </div>
+        </div>
+        <div class="ri-col-dot">
+          <span class="status-indicator-dot ${getStatusDotClass(r)}" title="${esc(r.status)}"></span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Add total rows footer — round to nearest 5 for clean grouping display
+  const roundedTotal = Math.ceil(arr.length / 5) * 5;
+  $('ruleListContainer').innerHTML += `
+    <div class="rule-list-total-footer">
+      <span class="total-rows-badge">${roundedTotal} rows</span>
+    </div>
+  `;
+
+  $('ruleListContainer').querySelectorAll('.rule-item').forEach(el => {
+    el.onclick = () => selectRuleByIndex(Number(el.dataset.i));
+  });
+
+  selectRuleByIndex(safeIdx);
+}
+
+function selectRuleByIndex(index) {
+  const arr = getFilteredEntries();
+  if (index < 0 || index >= arr.length) return;
+
+  const s = cur();
+  if (s.filter === 'DATA_QUALITY') s.dqSelected = index;
+  else s.selected = index;
+
+  const items = $('ruleListContainer').querySelectorAll('.rule-item');
+  items.forEach((el, j) => {
+    const isAct = j === index;
+    el.classList.toggle('active', isAct);
+    el.setAttribute('aria-selected', String(isAct));
+  });
+
+  const activeEl = items[index];
+  if (activeEl) {
+    activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  renderDetailView(arr[index], index, arr.length);
+}
+
+function clearDetailView() {
+  $('detailEmptyState').classList.remove('hidden');
+  $('stickyDetailHead').classList.add('hidden');
+  $('detailContentPane').classList.add('hidden');
+  $('stickyDetailHead').innerHTML = '';
+  $('detailContentPane').innerHTML = '';
+}
+
+/* ── Detail Panel Rendering ──────────────────────────────── */
+function renderDetailView(r, pos, total) {
+  $('detailEmptyState').classList.add('hidden');
+  $('stickyDetailHead').classList.remove('hidden');
+  $('detailContentPane').classList.remove('hidden');
+
+  const k = statusKey(r);
+  let statusBadgeText = 'UNCHANGED';
+  let badgeClass = 'sp-unchanged';
+
+  if (k === 'MODIFIED') {
+    statusBadgeText = '~ MODIFIED IN PROD';
+    badgeClass = 'sp-modified';
+  } else if (k === 'ADDED') {
+    statusBadgeText = '+ ADDED TO PROD';
+    badgeClass = 'sp-added';
+  } else if (k === 'REMOVED') {
+    statusBadgeText = '− REMOVED FROM PROD';
+    badgeClass = 'sp-removed';
+  } else if (k === 'DATA_QUALITY') {
+    statusBadgeText = '⚠ DATA QUALITY';
+    badgeClass = 'sp-dq';
+  }
+
+  const cleanId = getRuleDisplayId(r);
+
+  // Render Sticky Top Header in Detail Panel
+  $('stickyDetailHead').innerHTML = `
+    <div class="dsh-top">
+      <div class="dsh-title-group">
+        <span class="dsh-title" title="${esc(r.name || 'Entry')}">${esc(r.name || 'Entry')}</span>
+        <span class="dsh-id-tag">ID: ${esc(cleanId)}</span>
+      </div>
+      <div class="dsh-nav">
+        <button type="button" class="nav-btn" id="prevRuleBtn" ${pos === 0 ? 'disabled' : ''} title="Previous entry">↑</button>
+        <button type="button" class="nav-btn" id="nextRuleBtn" ${pos === total - 1 ? 'disabled' : ''} title="Next entry">↓</button>
+      </div>
+    </div>
+    <div class="dsh-sub">
+      <span class="status-pill ${badgeClass}">${statusBadgeText}</span>
+      ${r.audit_only ? '<span class="status-pill sp-audit">AUDIT UPDATE ONLY</span>' : ''}
+      <span class="dsh-flow-label">${esc(cur().result?.dev_label || 'DEV')} → ${esc(cur().result?.prod_label || 'PROD')}</span>
+    </div>
+  `;
+
+  $('prevRuleBtn').onclick = () => selectRuleByIndex(pos - 1);
+  $('nextRuleBtn').onclick = () => selectRuleByIndex(pos + 1);
+
+  // Compact Metadata Cards
+  let metaHtml = `
+    <div class="meta-cards-row">
+      <div class="meta-chip-card">
+        <div class="meta-chip-label">Module</div>
+        <div class="meta-chip-value">${esc(cur().result?.module_label || moduleLabel(currentModule))}</div>
+      </div>
+      <div class="meta-chip-card">
+        <div class="meta-chip-label">Status</div>
+        <div class="meta-chip-value">${esc(r.audit_only ? 'AUDIT ONLY' : r.status)}</div>
+      </div>
+      <div class="meta-chip-card">
+        <div class="meta-chip-label">${currentModule === 'process' ? 'Process ID' : 'Rule ID'}</div>
+        <div class="meta-chip-value">${esc(cleanId)}</div>
+      </div>
+  `;
+
+  // Hidden system OwnerID (per-module: 477 for PMR/Alert/Process, 0 for the newer tables)
+  // is omitted cleanly - engine.py already decided owner_hidden per module's config.
+  if (!r.owner_hidden && r.owner_id != null && String(r.owner_id).trim() !== '') {
+    metaHtml += `
+      <div class="meta-chip-card">
+        <div class="meta-chip-label">Owner ID</div>
+        <div class="meta-chip-value">${esc(r.owner_id)}</div>
+      </div>
+    `;
+  }
+  metaHtml += `</div>`;
+
+  let bodyHtml = metaHtml;
+
+  if (k === 'DATA_QUALITY') {
+    bodyHtml += renderDQDetail(r);
+  } else if (k === 'ADDED' || k === 'REMOVED') {
+    bodyHtml += renderPresenceDetail(r, k === 'ADDED');
+  } else {
+    bodyHtml += renderFunctionalDetail(r);
+  }
+
+  bodyHtml += renderAuditTrailSection(r);
+
+  $('detailContentPane').innerHTML = bodyHtml;
+  wireDetailEvents(r);
+  $('detailScrollPane').scrollTop = 0;
+}
+
+/* ── Data Quality Detail (Simplified, Clear & Field-by-Field) ── */
+function renderDQDetail(r) {
+  const reasons = r.dq_reasons || ['Anomaly detected in configuration record'];
+  const rawValues = r.raw_values || {};
+  const fieldIssues = r.field_issues || {};
+
+  const diagnoseIssue = reasonStr => {
+    const s = String(reasonStr || '').toLowerCase();
+    if (s.includes('invalid xml')) {
+      return {
+        title: 'Malformed or Truncated XML',
+        desc: 'The XML payload has syntax errors, unclosed tags, or truncated characters. Condition trees cannot be safely parsed.'
+      };
+    }
+    if (s.includes('date-corrupted')) {
+      return {
+        title: 'Excel Auto-Date Conversion Error',
+        desc: 'Excel automatically converted a numeric flag or status code into a date timestamp, distorting the original value.'
+      };
+    }
+    if (s.includes('scientific-notation')) {
+      return {
+        title: 'Scientific Notation Precision Loss',
+        desc: 'Excel formatted a long sequence of status codes as an exponential float (e.g. 1.234e+42), corrupting the numeric text.'
+      };
+    }
+    if (s.includes('invalid json')) {
+      return {
+        title: 'Invalid JSON Structure',
+        desc: 'The JSON metadata in this field contains syntax errors or unclosed brackets.'
+      };
+    }
+    return {
+      title: 'Formatting & Integrity Anomaly',
+      desc: reasonStr
+    };
+  };
+
+  let html = `
+    <div class="dq-hero-box">
+      <div class="dq-hero-top">
+        <span class="dq-hero-badge">⚠ DATA QUALITY & EXPORT ANOMALY</span>
+        <span class="dq-side-pill">Affected Side: <b>${esc(r.side || 'Source Export')}</b></span>
+      </div>
+      <p class="dq-explanation-text">
+        <b>Why is this record quarantined?</b> This entry contains corrupt, truncated, or Excel-distorted formatting in the source export.
+        Valid fields are compared normally, while problematic fields are quarantined here so you can review and report them for data remediation.
+      </p>
+    </div>
+
+    <div class="section-title-bar">
+      <span class="section-heading-text">DETECTED ISSUES & DIAGNOSIS (${reasons.length})</span>
+    </div>
+
+    <div class="dq-issues-list">
+      ${reasons.map(res => {
+        const diag = diagnoseIssue(res);
+        return `
+          <div class="dq-issue-card">
+            <span class="dq-issue-icon">⚠</span>
+            <div class="dq-issue-content">
+              <div class="dq-issue-title">${esc(diag.title)}</div>
+              <div class="dq-issue-desc">${esc(diag.desc)}</div>
+              <div style="margin-top:4px;font-size:11px;font-weight:800;color:var(--fuchsia)">Flag: ${esc(res)}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="section-title-bar">
+      <span class="section-heading-text">FIELD-BY-FIELD AUDIT INSPECTOR</span>
+    </div>
+
+    <div class="dq-table-container">
+      <div class="dq-table-head">
+        <div>Field Name</div>
+        <div>Integrity</div>
+        <div>DEV Value (${esc(cur().result?.dev_label || 'DEV')})</div>
+        <div>PROD Value (${esc(cur().result?.prod_label || 'PROD')})</div>
+      </div>
+  `;
+
+  const allFields = Object.keys(rawValues);
+  allFields.forEach(f => {
+    const valObj = rawValues[f] || {};
+    const devVal = valObj.dev !== undefined ? valObj.dev : 'Not present';
+    const prodVal = valObj.prod !== undefined ? valObj.prod : 'Not present';
+    const issue = fieldIssues[f];
+    const hasIssue = Boolean(issue);
+
+    const devBad = hasIssue && issue.dev;
+    const prodBad = hasIssue && issue.prod;
+    html += `
+      <div class="dq-table-row ${hasIssue ? 'has-issue' : ''}">
+        <div>
+          <b style="color:${hasIssue ? '#b91c1c' : 'var(--navy)'};font-size:12px">${esc(f)}</b>
+        </div>
+        <div>
+          ${hasIssue
+            ? `<span class="dq-field-badge badge-warn">⚠ Corrupted</span>
+               <div class="dq-issue-desc-inline">${esc(issue.desc || 'Value could not be parsed')}</div>`
+            : `<span class="dq-field-badge badge-ok">✓ Valid</span>`}
+        </div>
+        <div class="${devBad ? 'dq-value-bad' : ''}">${devBad ? '<span class="dq-value-flag">⚠</span>' : ''}${devBad ? highlightDQValue(devVal, issue?.desc) : renderValuePanel(devVal)}</div>
+        <div class="${prodBad ? 'dq-value-bad' : ''}">${prodBad ? '<span class="dq-value-flag">⚠</span>' : ''}${prodBad ? highlightDQValue(prodVal, issue?.desc) : renderValuePanel(prodVal)}</div>
+      </div>
+    `;
+  });
+
+  html += `
+    </div>
+
+    <div class="actual-values-section">
+      <button type="button" class="btn-expand-actuals" id="dqRawToggleBtn" aria-expanded="false">
+        <span class="toggle-icon">▸</span> View Raw Diagnostic Payload (for IT Ticket Submission)
+      </button>
+      <div class="actuals-expanded-body hidden" id="dqRawPane">
+        <pre class="black-value-panel">${esc(JSON.stringify(rawValues, null, 2))}</pre>
+      </div>
+    </div>
+  `;
+
+  return html;
+}
+
+/* ── Presence (Added / Removed) Detail ───────────────────── */
+function renderPresenceDetail(r, isAdded) {
+  const cls = isAdded ? 'added-box' : 'removed-box';
+  const title = isAdded ? '+ ADDED TO PROD' : '− REMOVED FROM PROD';
+  const desc = r.details?.message || (isAdded ? 'Entry exists in PROD but not in DEV baseline.' : 'Entry exists in DEV baseline but was removed in PROD.');
+
+  return `
+    <div class="status-info-box ${cls}">
+      <div class="status-info-title">${title}</div>
+      <div class="status-info-desc">${esc(desc)}</div>
+    </div>
+
+    <div class="actual-values-section">
+      <button type="button" class="btn-expand-actuals" id="presenceActualsToggle" aria-expanded="false">
+        <span class="toggle-icon">▸</span> View actual values
+      </button>
+      <div class="actuals-expanded-body hidden" id="presenceActualsBody">
+        <div class="env-comparison-grid">
+          <div class="env-pane">
+            <div class="env-pane-head">
+              <span class="env-pane-title">${esc(cur().result?.dev_label || 'DEV')}</span>
+              <span class="env-pane-badge">Baseline</span>
+            </div>
+            ${renderEnvFieldList(r.environment_values?.dev)}
+          </div>
+          <div class="env-pane">
+            <div class="env-pane-head">
+              <span class="env-pane-title">${esc(cur().result?.prod_label || 'PROD')}</span>
+              <span class="env-pane-badge">Audited</span>
+            </div>
+            ${renderEnvFieldList(r.environment_values?.prod)}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEnvFieldList(obj) {
+  if (!obj || !Object.keys(obj).length) {
+    return `<div class="val-tag val-missing">Not present</div>`;
+  }
+  return Object.entries(obj).map(([k, v]) => `
+    <div style="margin-bottom:8px">
+      <div style="font-size:10px;font-weight:800;color:var(--light);text-transform:uppercase;margin-bottom:3px">${esc(k)}</div>
+      ${renderValuePanel(v)}
+    </div>
+  `).join('');
+}
+
+/* ── Functional Differences Detail (Section 9 & 10) ──────── */
+function renderFunctionalDetail(r) {
+  const changes = r.changes || [];
+  const count = changes.length;
+
+  let html = `
+    <div class="section-title-bar">
+      <span class="section-heading-text">WHAT CHANGED IN PROD (${count})</span>
+      <div class="diff-legend-cluster">
+        <span class="diff-leg-item leg-txt-added"><b>+</b> Added to PROD</span>
+        <span class="diff-leg-item leg-txt-removed"><b>−</b> Removed from PROD</span>
+        <span class="diff-leg-item leg-txt-modified"><b>~</b> Modified in PROD</span>
+      </div>
+    </div>
+  `;
+
+  if (!count) {
+    html += `
+      <div class="status-info-box" style="background:var(--soft);">
+        <div class="status-info-desc" style="color:var(--muted)">✓ No functional changes detected in PROD.</div>
+      </div>
+    `;
+    return html;
+  }
+
+  // Section 9: Summary Table with exact heading "WHAT CHANGED IN PROD"
+  html += `
+    <div class="functional-summary-card">
+      <div class="fsc-head">
+        <div>Parameter</div>
+        <div>What changed in PROD</div>
+      </div>
+  `;
+
+  changes.forEach(c => {
+    const numChanges = c.details?.length || 1;
+    html += `
+      <div class="fsc-row">
+        <div class="fsc-col-field">
+          <span class="fsc-field-name">${esc(c.field)}</span>
+          <span class="fsc-field-count">${numChanges} change${numChanges === 1 ? '' : 's'}</span>
+        </div>
+        <div class="fsc-col-changes">
+          ${formatWhatChangedList(c)}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  // Section 10: Expandable control to view actual DEV/PROD values
+  html += `
+    <div class="actual-values-section">
+      <button type="button" class="btn-expand-actuals" id="actualsToggleBtn" aria-expanded="false">
+        <span class="toggle-icon">▸</span> View actual values
+      </button>
+      <div class="actuals-expanded-body hidden" id="actualsExpandedPane">
+        ${changes.map((c, i) => {
+          const [srcHtml, tgtHtml] = renderValuePanelPair(c.source, c.target);
+          return `
+          <div style="margin-bottom:14px">
+            <div style="font-size:11px;font-weight:800;color:var(--navy);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px">
+              <span>${esc(c.field)}</span>
+              <span class="diff-legend-inline"><mark class="diff-del">removed</mark><mark class="diff-add">added</mark></span>
+            </div>
+            <div class="env-comparison-grid">
+              <div class="env-pane">
+                <div class="env-pane-head">
+                  <span class="env-pane-title">${esc(cur().result?.dev_label || 'DEV')}</span>
+                  <span class="env-pane-badge">Baseline</span>
+                </div>
+                ${srcHtml}
+              </div>
+              <div class="env-pane">
+                <div class="env-pane-head">
+                  <span class="env-pane-title">${esc(cur().result?.prod_label || 'PROD')}</span>
+                  <span class="env-pane-badge">Audited</span>
+                </div>
+                ${tgtHtml}
+              </div>
+            </div>
+          </div>
+        `;}).join('')}
+      </div>
+    </div>
+  `;
+
+  return html;
+}
+
+const WC_LONG_THRESHOLD = 120; // chars — beyond this, collapse instead of dumping raw text
+
+function formatWhatChangedList(c) {
+  if (c.type === 'VALUE') {
+    const srcStr = c.source == null ? '' : String(c.source);
+    const tgtStr = c.target == null ? '' : String(c.target);
+    if (srcStr.length <= WC_LONG_THRESHOLD && tgtStr.length <= WC_LONG_THRESHOLD) {
+      return `<span class="leg-txt-modified">~ Modified in PROD: ${esc(c.source)} → ${esc(c.target)}</span>`;
+    }
+    // Long/raw blob (e.g. unclassified XML dump) — collapse behind <details>,
+    // reusing the existing word-diff engine instead of dumping raw text inline.
+    const [srcHtml, tgtHtml] = renderValuePanelPair(c.source, c.target);
+    return `
+      <details class="wc-collapse">
+        <summary class="leg-txt-modified">~ Modified in PROD <span class="wc-hint">(${srcStr.length + tgtStr.length} chars — click to view diff)</span></summary>
+        <div class="wc-diff-body">
+          <div class="wc-diff-col">
+            <div class="wc-diff-label">${esc(cur().result?.dev_label || 'DEV')}</div>
+            ${srcHtml}
+          </div>
+          <div class="wc-diff-col">
+            <div class="wc-diff-label">${esc(cur().result?.prod_label || 'PROD')}</div>
+            ${tgtHtml}
+          </div>
+        </div>
+      </details>`;
+  }
+  const items = (c.details || []).map(d => {
+    if (d.kind === 'added') return `<li class="leg-txt-added">+ ${esc(d.detail || d.path || '')} added to PROD</li>`;
+    if (d.kind === 'removed') return `<li class="leg-txt-removed">− ${esc(d.detail || d.path || '')} removed from PROD</li>`;
+    return `<li class="leg-txt-modified">~ ${esc(d.detail || d.path || '')} modified in PROD</li>`;
+  });
+
+  if (!items.length) {
+    return `<span class="leg-txt-modified">~ Modified in PROD</span>`;
+  }
+  return `<ul class="change-bullet-list">${items.join('')}</ul>`;
+}
+
+/* ── DQ corruption highlighter — marks the exact substring that broke
+   (sci-notation, Excel serial date, unclosed tag) instead of just a red row */
+function highlightDQValue(val, issueDesc) {
+  if (val === null || val === undefined || val === 'Not present' || val === 'Not recorded') {
+    return `<div class="val-tag val-missing">Not present</div>`;
+  }
+  const str = String(val);
+  if (str.trim() === '') return `<div class="val-tag val-blank">(blank)</div>`;
+
+  // Pick the ONE pattern that matches what the backend (_field_dq_reason)
+  // actually flagged this field for, instead of running every pattern on
+  // every value and guessing. Blind guessing is how a plain 5-digit ID
+  // got marked as a fake "Excel date serial" — that pattern never
+  // corresponded to a real backend reason in the first place.
+  const desc = String(issueDesc || '');
+  let pattern = null;
+  if (/scientific-notation/i.test(desc)) {
+    pattern = /\d(?:\.\d+)?[eE][+-]?\d+/g;
+  } else if (/date-corrupted/i.test(desc)) {
+    // Same date shape _field_dq_reason used to classify the value as a date.
+    pattern = /\d{1,4}[-/]\d{1,2}[-/]\d{1,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?/g;
+  } else if (/invalid XML/i.test(desc)) {
+    pattern = /<[^>]*$/g; // unclosed/truncated tag at end
+  }
+  // "invalid JSON" and the Excel cell-limit truncation reason have no
+  // reliable substring to point at — fall through and mark the whole
+  // value rather than guessing at a location.
+
+  if (!pattern) {
+    return `<pre class="black-value-panel"><mark class="dq-corrupt-highlight">${esc(str)}</mark></pre>`;
+  }
+
+  // Match on the RAW string (regex needs real "<", not "&lt;"), then escape
+  // piece-by-piece so highlighted spans stay HTML-safe.
+  const spans = [];
+  let last = 0, m;
+  pattern.lastIndex = 0;
+  while ((m = pattern.exec(str))) {
+    if (m[0] === '') { pattern.lastIndex++; continue; }
+    if (m.index > last) spans.push({ text: str.slice(last, m.index), mark: false });
+    spans.push({ text: m[0], mark: true });
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) spans.push({ text: str.slice(last), mark: false });
+
+  // Safety net: the backend can flag this same reason via a path our regex
+  // doesn't cover — e.g. "scientific-notation garbage" also fires on a huge
+  // plain digit string (Excel's huge_numeric >= 1e20 check) with no literal
+  // "e" in it at all. If the category-specific pattern found nothing, don't
+  // silently render the flagged value with zero indication of what's wrong
+  // — mark the whole value instead, same as the no-pattern fallback above.
+  if (!spans.length || !spans.some(s => s.mark)) {
+    return `<pre class="black-value-panel"><mark class="dq-corrupt-highlight">${esc(str)}</mark></pre>`;
+  }
+
+  const html = spans.map(s => s.mark ? `<mark class="dq-corrupt-highlight">${esc(s.text)}</mark>` : esc(s.text)).join('');
+  return `<pre class="black-value-panel">${html}</pre>`;
+}
+
+function renderValuePanel(val) {
+  if (val === null || val === undefined || val === 'Not present' || val === 'Not recorded') {
+    return `<div class="val-tag val-missing">Not present</div>`;
+  }
+  const str = String(val);
+  if (str.trim() === '' || str === '(blank)') {
+    return `<div class="val-tag val-blank">(blank)</div>`;
+  }
+  return `<pre class="black-value-panel">${esc(str)}</pre>`;
+}
+
+/* ── Diff Highlighting: pinpoint exactly what changed inside a long
+   value (e.g. FilterExpression XML) instead of forcing a re-read of the
+   whole blob ─────────────────────────────────────────────────────── */
+function tokenizeForDiff(str) {
+  // '<' and '>' are always their own tokens (in addition to whitespace runs
+  // and other non-whitespace runs). This matters because minified XML glues
+  // adjacent tags together with zero separator ("<mappers><on"), while
+  // pretty-printed XML inserts whitespace between them ("<mappers>" + " " +
+  // "<on") - splitting ONLY on whitespace (the previous approach) makes
+  // those two forms tokenize completely differently even when the actual
+  // tag content is identical, which cascades into a huge false diff.
+  // Isolating '<'/'>' as their own tokens means both forms reduce to the
+  // same token sequence once whitespace-only tokens are filtered out.
+  return str.match(/[<>]|\s+|[^\s<>]+/g) || [];
+}
+
+function isWhitespace(s) {
+  return /^\s+$/.test(s);
+}
+
+// High-performance word-level diffing for long text and massive XML configuration
+// blobs (e.g. LayoutXML, DesignerXML, FilterExpression).
+//
+// Whitespace tokens are stripped out BEFORE diffing (not just "treated as
+// equal" - a prior attempt did that, but it only helps when both sides have
+// a whitespace token at the same aligned slot with different content; it
+// does nothing when reformatting INSERTS a whitespace token that doesn't
+// exist on the other side at all, e.g. minified "><" becoming pretty-printed
+// ">\n  <". Myers correctly sees that as a real insertion, and once token
+// counts diverge that much across a whole file, alignment cascades and drags
+// real content tokens into the edit script too - producing a wall of marks
+// on a file that's semantically identical). Diffing only the significant
+// (non-whitespace) tokens sidesteps this entirely: whitespace can never
+// appear in the edit script, so it can never be marked, full stop.
+//
+// ALGORITHM & COMPLEXITY:
+// 1. O(N) common-prefix and common-suffix trimming isolates only the mutated middle span.
+// 2. Myers O((N+M)*D) Shortest Edit Script (SES) algorithm computes precise word-level
+//    diffs across the changed middle region (where D = edit distance).
+// A safety ceiling of maxD = 5000 guards against completely disjoint massive
+// files (preventing long UI freezes); real-world config diffs never approach it.
+function diffTokenSeq(a, b) {
+  const n = a.length, m = b.length;
+  if (n === 0 && m === 0) return [];
+
+  let start = 0;
+  while (start < n && start < m && a[start] === b[start]) start++;
+
+  let endA = n - 1, endB = m - 1;
+  while (endA >= start && endB >= start && a[endA] === b[endB]) { endA--; endB--; }
+
+  const prefixOps = [];
+  for (let i = 0; i < start; i++) prefixOps.push({ t: 'eq', v: a[i] });
+
+  const suffixOps = [];
+  const suffixLen = n - 1 - endA;
+  for (let k = 0; k < suffixLen; k++) suffixOps.push({ t: 'eq', v: a[endA + 1 + k] });
+
+  const nMid = endA - start + 1;
+  const mMid = endB - start + 1;
+
+  if (nMid === 0 && mMid === 0) return prefixOps.concat(suffixOps);
+  if (nMid === 0) {
+    const midOps = [];
+    for (let j = start; j <= endB; j++) midOps.push({ t: 'add', v: b[j] });
+    return prefixOps.concat(midOps, suffixOps);
+  }
+  if (mMid === 0) {
+    const midOps = [];
+    for (let i = start; i <= endA; i++) midOps.push({ t: 'del', v: a[i] });
+    return prefixOps.concat(midOps, suffixOps);
+  }
+
+  const maxD = Math.min(5000, nMid + mMid);
+  const offset = maxD;
+  const v = new Int32Array(2 * maxD + 1);
+  const trace = [];
+  let foundD = -1;
+
+  for (let d = 0; d <= maxD; d++) {
+    const vSnap = new Int32Array(2 * d + 1);
+    for (let k = -d, idx = 0; k <= d; k++, idx++) vSnap[idx] = v[offset + k];
+    trace.push(vSnap);
+
+    for (let k = -d; k <= d; k += 2) {
+      const kIdx = offset + k;
+      let x;
+      if (k === -d || (k !== d && v[kIdx - 1] < v[kIdx + 1])) x = v[kIdx + 1];
+      else x = v[kIdx - 1] + 1;
+      let y = x - k;
+
+      while (x < nMid && y < mMid && a[start + x] === b[start + y]) { x++; y++; }
+
+      v[kIdx] = x;
+      if (x >= nMid && y >= mMid) { foundD = d; break; }
+    }
+    if (foundD !== -1) break;
+  }
+
+  if (foundD === -1) return null; // edit distance exceeded safety ceiling
+
+  const midOps = [];
+  let x = nMid, y = mMid;
+
+  for (let d = foundD; d > 0; d--) {
+    const vPrev = trace[d];
+    const k = x - y;
+    let prevK;
+    if (k === -d || (k !== d && vPrev[(k - 1) + d] < vPrev[(k + 1) + d])) prevK = k + 1;
+    else prevK = k - 1;
+
+    const prevX = vPrev[prevK + d];
+    const prevY = prevX - prevK;
+
+    while (x > prevX && y > prevY) { x--; y--; midOps.push({ t: 'eq', v: a[start + x] }); }
+
+    if (x === prevX) { y--; midOps.push({ t: 'add', v: b[start + y] }); }
+    else if (y === prevY) { x--; midOps.push({ t: 'del', v: a[start + x] }); }
+  }
+
+  while (x > 0 && y > 0) { x--; y--; midOps.push({ t: 'eq', v: a[start + x] }); }
+
+  midOps.reverse();
+  return prefixOps.concat(midOps, suffixOps);
+}
+
+// Rebuilds one side's full HTML: walks that side's OWN original token stream
+// (whitespace included, untouched) and marks only the significant tokens the
+// diff flagged - whitespace is never looked up in `marks` and never marked.
+function buildSideHtml(tokens, marks, markClass) {
+  let html = '';
+  let sigIdx = 0;
+  for (const tok of tokens) {
+    if (isWhitespace(tok)) { html += esc(tok); continue; }
+    html += marks[sigIdx] ? `<mark class="${markClass}">${esc(tok)}</mark>` : esc(tok);
+    sigIdx++;
+  }
+  return html;
+}
+
+// Renders DEV/PROD as a matched pair — highlights exactly the tokens that
+// differ between them. Falls back to plain rendering when either side is
+// missing/blank or the value is too large to diff cheaply.
+function renderValuePanelPair(sourceVal, targetVal) {
+  const missing = v => v === null || v === undefined || v === 'Not present' || v === 'Not recorded';
+  if (missing(sourceVal) || missing(targetVal)) {
+    return [renderValuePanel(sourceVal), renderValuePanel(targetVal)];
+  }
+  const srcStr = String(sourceVal), tgtStr = String(targetVal);
+  if (srcStr.trim() === '' || tgtStr.trim() === '' || srcStr === tgtStr) {
+    return [renderValuePanel(sourceVal), renderValuePanel(targetVal)];
+  }
+
+  const srcTokens = tokenizeForDiff(srcStr);
+  const tgtTokens = tokenizeForDiff(tgtStr);
+
+  // Diff ONLY the significant (non-whitespace) tokens - whitespace can never
+  // enter the edit script this way, so pure reformatting (indentation,
+  // line-break style) can never produce a mark, no matter how many
+  // whitespace tokens were inserted/removed/changed.
+  const srcSig = srcTokens.filter(t => !isWhitespace(t));
+  const tgtSig = tgtTokens.filter(t => !isWhitespace(t));
+
+  const ops = diffTokenSeq(srcSig, tgtSig);
+  if (!ops) return [renderValuePanel(sourceVal), renderValuePanel(targetVal)];
+
+  const srcMarks = new Array(srcSig.length).fill(false);
+  const tgtMarks = new Array(tgtSig.length).fill(false);
+  let si = 0, ti = 0;
+  for (const op of ops) {
+    if (op.t === 'eq') { si++; ti++; }
+    else if (op.t === 'del') { srcMarks[si] = true; si++; }
+    else if (op.t === 'add') { tgtMarks[ti] = true; ti++; }
+  }
+
+  return [
+    `<pre class="black-value-panel">${buildSideHtml(srcTokens, srcMarks, 'diff-del')}</pre>`,
+    `<pre class="black-value-panel">${buildSideHtml(tgtTokens, tgtMarks, 'diff-add')}</pre>`
+  ];
+}
+
+/* ── Modification Metadata Section (Section 11) ────────────────────── */
+function renderAuditTrailSection(r) {
+  const auditDiffs = r.audit_changes || [];
+  const hasAuditChanges = auditDiffs.length > 0;
+
+  return `
+    <div class="audit-accordion">
+      <button type="button" class="audit-accordion-header" id="auditAccordionToggle" aria-expanded="false">
+        <span class="chevron">›</span>
+        <span class="audit-title">Modification Metadata</span>
+        <span class="audit-status-tag ${hasAuditChanges ? 'tag-has-changes' : 'tag-no-changes'}">
+          ${hasAuditChanges ? 'Has changes' : 'No audit changes'}
+        </span>
+      </button>
+      <div class="audit-accordion-body hidden" id="auditAccordionBody">
+        <div class="audit-grid">
+          <div class="audit-pane">
+            <div class="audit-pane-head">${esc(cur().result?.dev_label || 'DEV')}</div>
+            <div class="audit-prop">
+              <span class="audit-prop-lbl">Modified by · User ID:</span>
+              <span class="audit-prop-val">${esc(r.dev_audit?.last_modified_by || 'Not recorded')}</span>
+            </div>
+            <div class="audit-prop">
+              <span class="audit-prop-lbl">Modified on:</span>
+              <span class="audit-prop-val">${esc(r.dev_audit?.last_modified_on || 'Not recorded')}</span>
+            </div>
+          </div>
+          <div class="audit-pane">
+            <div class="audit-pane-head">${esc(cur().result?.prod_label || 'PROD')}</div>
+            <div class="audit-prop">
+              <span class="audit-prop-lbl">Modified by · User ID:</span>
+              <span class="audit-prop-val">${esc(r.prod_audit?.last_modified_by || 'Not recorded')}</span>
+            </div>
+            <div class="audit-prop">
+              <span class="audit-prop-lbl">Modified on:</span>
+              <span class="audit-prop-val">${esc(r.prod_audit?.last_modified_on || 'Not recorded')}</span>
+            </div>
+          </div>
+        </div>
+        ${hasAuditChanges ? `
+          <div class="audit-diff-banner">
+            ${auditDiffs.map(d => `
+              <div class="audit-diff-item">
+                <b>${esc(d.field)}:</b>
+                <span>${esc(d.source)} → ${esc(d.target)}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function wireDetailEvents(r) {
+  // Actual values toggle for functional differences
+  const actualsBtn = $('actualsToggleBtn');
+  const actualsPane = $('actualsExpandedPane');
+  if (actualsBtn && actualsPane) {
+    actualsBtn.onclick = () => {
+      const isHidden = actualsPane.classList.contains('hidden');
+      actualsPane.classList.toggle('hidden', !isHidden);
+      actualsBtn.setAttribute('aria-expanded', String(isHidden));
+      actualsBtn.innerHTML = isHidden ? '<span class="toggle-icon">▲</span> Hide actual values' : '<span class="toggle-icon">▸</span> View actual values';
+    };
+  }
+
+  // Actual values toggle for presence (Added / Removed)
+  const presBtn = $('presenceActualsToggle');
+  const presPane = $('presenceActualsBody');
+  if (presBtn && presPane) {
+    presBtn.onclick = () => {
+      const isHidden = presPane.classList.contains('hidden');
+      presPane.classList.toggle('hidden', !isHidden);
+      presBtn.setAttribute('aria-expanded', String(isHidden));
+      presBtn.innerHTML = isHidden ? '<span class="toggle-icon">▲</span> Hide actual values' : '<span class="toggle-icon">▸</span> View actual values';
+    };
+  }
+
+  // Audit trail toggle
+  const auditBtn = $('auditAccordionToggle');
+  const auditBody = $('auditAccordionBody');
+  if (auditBtn && auditBody) {
+    auditBtn.onclick = () => {
+      const isHidden = auditBody.classList.contains('hidden');
+      auditBody.classList.toggle('hidden', !isHidden);
+      auditBtn.setAttribute('aria-expanded', String(isHidden));
+      auditBtn.querySelector('.chevron').textContent = isHidden ? '⌄' : '›';
+      cur().auditOpen = isHidden;
+    };
+    if (cur().auditOpen) {
+      auditBody.classList.remove('hidden');
+      auditBtn.setAttribute('aria-expanded', 'true');
+      auditBtn.querySelector('.chevron').textContent = '⌄';
+    }
+  }
+
+  // Data Quality Raw JSON Toggle
+  const dqRawBtn = $('dqRawToggleBtn');
+  const dqRawPane = $('dqRawPane');
+  if (dqRawBtn && dqRawPane) {
+    dqRawBtn.onclick = () => {
+      const isHidden = dqRawPane.classList.contains('hidden');
+      dqRawPane.classList.toggle('hidden', !isHidden);
+      dqRawBtn.setAttribute('aria-expanded', String(isHidden));
+      dqRawBtn.innerHTML = isHidden 
+        ? '<span class="toggle-icon">▲</span> Hide Raw Diagnostic Payload' 
+        : '<span class="toggle-icon">▸</span> View Raw Diagnostic Payload (for IT Ticket Submission)';
+    };
+  }
+}
+
+/* ── Keyboard Navigation (Section 7) ─────────────────────── */
+// ↑ / ↓        = move through records in rule list
+// ← / →        = cycle KPI filter chips (Modified → Added → Removed → …)
+// Tab / Shift+Tab = switch modules / tables (PMR → Alert Rule → Process)
+// Home / End    = jump to first / last record
+//
+// Compatibility: we check BOTH e.key and e.code so that non-US layouts,
+// Fn-remapped keys (common on compact laptops), Chromebooks, and Surface
+// keyboards all map correctly.
+
+const FILTER_CYCLE_ORDER = ['MODIFIED', 'ADDED', 'REMOVED', 'AUDIT-ONLY', 'DATA_QUALITY', 'ALL'];
+
+// Normalise physical key → action. e.key uses the logical label,
+// e.code uses the physical position — checking both covers edge cases.
+function resolveKeyAction(e) {
+  // Tab is special — direction depends on Shift
+  if (e.key === 'Tab' || e.code === 'Tab') {
+    return e.shiftKey ? 'modulePrev' : 'moduleNext';
+  }
+
+  const map = {
+    ArrowUp: 'up',    ArrowDown: 'down',
+    ArrowLeft: 'filterLeft', ArrowRight: 'filterRight',
+    Home: 'home',     End: 'end'
+  };
+
+  return map[e.key] || map[e.code] || null;
+}
+
+function cycleFilter(delta) {
+  const s = cur();
+  const currentFilterIdx = FILTER_CYCLE_ORDER.indexOf(s.filter);
+  const nextIdx = (currentFilterIdx + delta + FILTER_CYCLE_ORDER.length) % FILTER_CYCLE_ORDER.length;
+  s.filter = FILTER_CYCLE_ORDER[nextIdx];
+  s.selected = 0;
+  s.dqSelected = 0;
+  renderSummaryChips();
+  renderRuleList();
+}
+
+document.addEventListener('keydown', e => {
+  // Never intercept keys when user is typing in an input
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable) {
+    return;
+  }
+
+  const action = resolveKeyAction(e);
+  if (!action) return;
+
+  // ── Tab / Shift+Tab  →  switch modules ──
+  if (action === 'moduleNext' || action === 'modulePrev') {
+    e.preventDefault();
+    e.stopPropagation();
+    closeAllDropdowns();
+    cycleModule(action === 'moduleNext' ? 1 : -1);
+    return;
+  }
+
+  // ── ← / →  →  cycle KPI filter chips ──
+  if (action === 'filterLeft') {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!cur().result) return;
+    cycleFilter(-1);
+    return;
+  }
+  if (action === 'filterRight') {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!cur().result) return;
+    cycleFilter(1);
+    return;
+  }
+
+  // ── ↑ / ↓ / Home / End  →  navigate rule list ──
+  const entries = getFilteredEntries();
+  if (!entries.length) return;
+
+  const s = cur();
+  const currentIdx = s.filter === 'DATA_QUALITY' ? s.dqSelected : s.selected;
+
+  if (action === 'down') {
+    e.preventDefault();
+    e.stopPropagation();
+    selectRuleByIndex(Math.min(currentIdx + 1, entries.length - 1));
+  } else if (action === 'up') {
+    e.preventDefault();
+    e.stopPropagation();
+    selectRuleByIndex(Math.max(currentIdx - 1, 0));
+  } else if (action === 'home') {
+    e.preventDefault();
+    e.stopPropagation();
+    selectRuleByIndex(0);
+  } else if (action === 'end') {
+    e.preventDefault();
+    e.stopPropagation();
+    selectRuleByIndex(entries.length - 1);
+  }
+}, { capture: true });
+
+/* ── Initial Startup ─────────────────────────────────────── */
+console.log(
+  "%c Configuration Comparison Tool v12.3 %c Author: BeastOfSyn (Seal: BSN-CORE-42656173744f6653796e) ",
+  "background: #0d1b2e; color: #ffffff; font-weight: bold; padding: 4px 8px; border-radius: 3px 0 0 3px;",
+  "background: #e8006a; color: #ffffff; font-weight: bold; padding: 4px 8px; border-radius: 0 3px 3px 0;"
+);
+
+window.__BSN_SIGNATURE__ = {
+  author: "BeastOfSyn",
+  seal: "BSN-CORE-42656173744f6653796e",
+  timestamp: "2026-08-19",
+  engine: "Configuration AST Diff Tracker"
+};
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+    console.info("⚡ [SEAL VERIFIED]: BeastOfSyn | Seal: BSN-CORE-42656173744f6653796e");
+    alert("⚡ Configuration Comparison Tool v12.3\nAuthor: BeastOfSyn\nSeal: BSN-CORE-42656173744f6653796e");
+  }
+});
+
+updateHeaderLabels();
+showUploadScreen();
+</script>
+</body>
+</html>
